@@ -109,7 +109,7 @@
                         <input type="file" id="order-file" required accept=".pdf,.png,.jpg,.jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     </div>
 
-                    <!-- Kotak Pratonton Fail (Preview Container) -->
+                    <!-- Kotak Pratonton Fail -->
                     <div id="file-preview-container" class="hidden mt-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl p-4">
                         <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
                             <div class="flex items-center gap-3">
@@ -170,7 +170,7 @@
                             <label class="block text-xs text-slate-300 font-semibold mb-1">Mod Penerimaan</label>
                             <select id="receive-mode" class="w-full glass-input rounded-xl py-2.5 px-3 text-sm bg-slate-900 cursor-pointer">
                                 <option value="pickup">Self Pickup (Percuma)</option>
-                                <option value="delivery">Delivery / Penghantaran (+RM 5.00)</option>
+                                <option value="delivery">Delivery / Penghantaran (+RM 0.50)</option>
                             </select>
                         </div>
                     </div>
@@ -262,7 +262,7 @@
         const db = getFirestore(app);
 
         let currentUser = null;
-        let detectedPageCount = 1; // Default 1 page
+        let detectedPageCount = 1;
 
         // Auto Fill User Email bila Log In
         onAuthStateChanged(auth, (user) => {
@@ -275,7 +275,7 @@
         });
 
         // -------------------------------------------------------------
-        // LOGIK MEMBACA FAIL & PRATONTON (PREVIEW & PAGE COUNT)
+        // LOGIK MEMBACA FAIL & PRATONTON
         // -------------------------------------------------------------
         const fileInput = document.getElementById('order-file');
         const dropZone = document.getElementById('drop-zone');
@@ -297,7 +297,6 @@
             previewContainer.classList.remove('hidden');
             previewFileName.textContent = file.name;
 
-            // Reset view
             pdfCanvas.classList.add('hidden');
             imgPreview.classList.add('hidden');
 
@@ -305,7 +304,6 @@
                 fileIcon.className = "fa-solid fa-file-pdf text-red-500 text-2xl";
                 previewFileInfo.textContent = "Mengira muka surat PDF...";
                 
-                // Baca PDF menggunakan PDF.js
                 const fileReader = new FileReader();
                 fileReader.onload = async function() {
                     const typedarray = new Uint8Array(this.result);
@@ -314,7 +312,6 @@
                         detectedPageCount = pdf.numPages;
                         previewFileInfo.textContent = `Dokumen PDF • ${detectedPageCount} Muka Surat`;
 
-                        // Render Halaman Pertama ke Canvas untuk Preview
                         const page = await pdf.getPage(1);
                         const viewport = page.getViewport({ scale: 0.8 });
                         const context = pdfCanvas.getContext('2d');
@@ -326,14 +323,14 @@
                         calculateTotal();
                     } catch (err) {
                         console.error("Ralat PDF:", err);
-                        previewFileInfo.textContent = "Gagal membaca PDF (Fail mungkin diprotect)";
+                        previewFileInfo.textContent = "Gagal membaca PDF";
                     }
                 };
                 fileReader.readAsArrayBuffer(file);
 
             } else if (file.type.startsWith("image/")) {
                 fileIcon.className = "fa-solid fa-file-image text-cyan-400 text-2xl";
-                detectedPageCount = 1; // Gambar dikira 1 page
+                detectedPageCount = 1;
                 previewFileInfo.textContent = "Dokumen Imej • 1 Muka Surat";
 
                 const reader = new FileReader();
@@ -350,7 +347,6 @@
             }
         }
 
-        // Butang Padam Fail
         btnRemoveFile.addEventListener('click', () => {
             fileInput.value = "";
             detectedPageCount = 1;
@@ -367,28 +363,25 @@
         const quantityInput = document.getElementById('order-quantity');
         const receiveModeSelect = document.getElementById('receive-mode');
 
-        // Event listeners untuk calculate balik bila bertukar pilihan
         [printColorSelect, printSidesSelect, quantityInput, receiveModeSelect].forEach(el => {
             el.addEventListener('change', calculateTotal);
             el.addEventListener('input', calculateTotal);
         });
 
         function calculateTotal() {
-            const colorType = printColorSelect.value; // 'bw' atau 'color'
+            const colorType = printColorSelect.value;
             const copies = parseInt(quantityInput.value) || 1;
-            const receiveMode = receiveModeSelect.value; // 'pickup' atau 'delivery'
+            const receiveMode = receiveModeSelect.value;
 
-            // Harga per page: Hitam Putih = RM0.30, Warna = RM0.60
+            // Hitam Putih = RM0.30, Warna = RM0.60
             const ratePerPage = (colorType === 'color') ? 0.60 : 0.30;
             
-            // Delivery Charge
-            const deliveryCharge = (receiveMode === 'delivery') ? 5.00 : 0.00;
+            // KOS PENGHANTARAN = 50 SEN (RM0.50)
+            const deliveryCharge = (receiveMode === 'delivery') ? 0.50 : 0.00;
 
-            // Pengiraan Keseluruhan
             const totalPrintCost = (detectedPageCount * ratePerPage) * copies;
             const finalTotal = totalPrintCost + deliveryCharge;
 
-            // Kemaskini Paparan Resit
             document.getElementById('resit-pages').textContent = `${detectedPageCount} Page${detectedPageCount > 1 ? 's' : ''}`;
             document.getElementById('resit-rate').textContent = `RM ${ratePerPage.toFixed(2)}`;
             document.getElementById('resit-copies').textContent = `${copies} Cop${copies > 1 ? 'ies' : 'y'}`;
@@ -451,17 +444,14 @@
                 btnSubmit.disabled = true;
                 btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memuat Naik Fail ke Drive...</span>`;
 
-                // 1. Convert fail ke Base64
                 const base64Data = await fileToBase64(file);
 
-                // 2. Payload Drive
                 const uploadPayload = {
                     fileName: `${Date.now()}_${file.name}`,
                     mimeType: file.type || "application/octet-stream",
                     fileData: base64Data
                 };
 
-                // 3. Post ke Google Apps Script
                 const driveResponse = await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
                     headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -476,7 +466,6 @@
 
                 btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menyimpan Tempahan...</span>`;
 
-                // 4. Simpan ke Firestore Database
                 await addDoc(collection(db, "orders"), {
                     userId: currentUser.uid,
                     recipientName: document.getElementById('recipient-name').value.trim(),
