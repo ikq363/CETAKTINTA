@@ -11,6 +11,10 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Google API & Identity Services SDK -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; overflow-x: hidden; }
         .animated-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); position: relative; }
@@ -55,7 +59,7 @@
                 <h1 class="text-2xl font-bold text-white flex items-center gap-2 mb-1">
                     <i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Buat Tempahan Cetak
                 </h1>
-                <p class="text-xs text-slate-400">Isi maklumat tempahan dan muat naik dokumen anda di bawah.</p>
+                <p class="text-xs text-slate-400">Isi maklumat tempahan dan muat naik dokumen anda secara terus ke Google Drive.</p>
             </div>
 
             <!-- Alert Notification Box -->
@@ -103,7 +107,7 @@
                 <!-- Submit Button -->
                 <button type="submit" id="btn-submit-order" class="glow-btn w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-sm hover:opacity-90 transition mt-4 flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-paper-plane"></i>
-                    <span>Hantar Tempahan</span>
+                    <span>Hantar Tempahan & Upload ke Drive</span>
                 </button>
             </form>
         </div>
@@ -114,14 +118,19 @@
         &copy; 2026 Cetak Tinta. Hak Cipta Terpelihara.
     </footer>
 
-    <!-- Firebase & Upload Script -->
+    <!-- Firebase & Google Drive Cloud API Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // URL Web App Google Apps Script Baharu Anda
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKo29TVLrU8Eyd6uGBbCjm0w7Jr8mg1lBHlVGhUINBfUzsl_oWbKj3-ObZdSav2QAd/exec";
+        // ==========================================
+        // 🔑 MAKLUMAT GOOGLE CLOUD ANDA
+        // ==========================================
+        const CLIENT_ID = '561132032640-qpmp3t90p1h8levjenqijjpn6nhkui1e.apps.googleusercontent.com';
+        const API_KEY = 'AIzaSyBluXt1gYGZW0Tls1FC75AkqnM6BdKgQhs';
+        const DRIVE_FOLDER_ID = '1R-E6uBS3PcnhentR4ehKwzpijZj9iUPb';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
         // Konfigurasi Firebase Anda
         const firebaseConfig = {
@@ -139,6 +148,7 @@
         const db = getFirestore(app);
 
         let currentUser = null;
+        let tokenClient;
 
         // Semak pengesahan pengguna
         onAuthStateChanged(auth, (user) => {
@@ -148,6 +158,22 @@
                 window.location.href = "login.html";
             }
         });
+
+        // Initialize Google API & Identity Services
+        window.onload = () => {
+            gapi.load('client', async () => {
+                await gapi.client.init({
+                    apiKey: API_KEY,
+                    discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
+                });
+            });
+
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: '', // Dihandle secara async semasa submit
+            });
+        };
 
         // Papar nama fail dipilih
         const fileInput = document.getElementById('order-file');
@@ -172,15 +198,18 @@
             }
         }
 
-        // Tukar fail ke format Base64
-        const fileToBase64 = (file) => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = (error) => reject(error);
-        });
+        // Dapatkan Google OAuth Access Token
+        function getGoogleAccessToken() {
+            return new Promise((resolve, reject) => {
+                tokenClient.callback = (resp) => {
+                    if (resp.error) reject(resp);
+                    resolve(resp.access_token);
+                };
+                tokenClient.requestAccessToken({ prompt: '' });
+            });
+        }
 
-        // PROSES SUBMIT ORDER
+        // PROSES SUBMIT ORDER (Google Drive REST API v3)
         document.getElementById('order-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
@@ -188,44 +217,41 @@
             const btnSubmit = document.getElementById('btn-submit-order');
             const file = fileInput.files[0];
 
-            // Semak saiz fail (Had maksimum 10MB)
-            if (file.size > 10 * 1024 * 1024) {
-                showAlert("Saiz fail terlalu besar! Sila muat naik fail bawah 10MB.", "error");
-                return;
-            }
-
             try {
                 btnSubmit.disabled = true;
-                btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memuat Naik Fail ke Drive...</span>`;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Meminta Akses Google...</span>`;
 
-                // 1. Convert fail ke Base64
-                const base64Data = await fileToBase64(file);
+                // 1. Dapatkan Token Akses OAuth Google
+                const accessToken = await getGoogleAccessToken();
 
-                // 2. Data payload fail
-                const uploadPayload = {
-                    fileName: `${Date.now()}_${file.name}`,
-                    mimeType: file.type || "application/octet-stream",
-                    fileData: base64Data
+                btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memuat Naik ke Google Drive...</span>`;
+
+                // 2. Sediakan Metadata Fail untuk Google Drive API
+                const metadata = {
+                    name: `${Date.now()}_${file.name}`,
+                    parents: [DRIVE_FOLDER_ID]
                 };
 
-                // 3. Hantar fail ke Google Apps Script (guna text/plain untuk pintar sekatan CORS)
-                const driveResponse = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "text/plain;charset=utf-8"
-                    },
-                    body: JSON.stringify(uploadPayload)
+                const formData = new FormData();
+                formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                formData.append('file', file);
+
+                // 3. Upload Terus ke REST API Google Drive v3
+                const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
+                    method: 'POST',
+                    headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
+                    body: formData
                 });
 
-                const driveResult = await driveResponse.json();
+                const driveFile = await response.json();
 
-                if (driveResult.result !== "success") {
-                    throw new Error(driveResult.error || "Gagal menyimpan fail ke Drive.");
+                if (!driveFile.id) {
+                    throw new Error("Gagal muat naik fail ke Google Drive API.");
                 }
 
                 btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menyimpan Tempahan...</span>`;
 
-                // 4. Simpan maklumat order ke Firestore Collection 'orders'
+                // 4. Simpan Maklumat Order ke Firestore Collection 'orders'
                 await addDoc(collection(db, "orders"), {
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
@@ -233,13 +259,14 @@
                     printType: document.getElementById('print-type').value,
                     quantity: parseInt(document.getElementById('order-quantity').value),
                     notes: document.getElementById('order-notes').value.trim(),
-                    fileUrl: driveResult.fileUrl,
-                    fileDriveId: driveResult.fileId,
+                    fileName: file.name,
+                    fileUrl: driveFile.webViewLink,
+                    fileDriveId: driveFile.id,
                     status: "Pending",
                     createdAt: serverTimestamp()
                 });
 
-                showAlert("Tempahan berjaya dihantar dan fail tersimpan di Google Drive!", "success");
+                showAlert("Tempahan berjaya dihantar terus ke Google Drive!", "success");
 
                 setTimeout(() => {
                     window.location.href = "dashboard.html";
@@ -247,10 +274,10 @@
 
             } catch (error) {
                 console.error("Ralat tempahan:", error);
-                showAlert("Gagal menghantar tempahan: " + error.message, "error");
+                showAlert("Gagal menghantar tempahan: " + (error.message || "Ralat Kebenaran Google"), "error");
             } finally {
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Hantar Tempahan</span>`;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Hantar Tempahan & Upload ke Drive</span>`;
             }
         });
     </script>
