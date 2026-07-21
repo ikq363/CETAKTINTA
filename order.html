@@ -31,7 +31,21 @@
         .blob-2 { bottom: 5%; right: 5%; width: 280px; height: 280px; background: #a855f7; }
     </style>
 </head>
-<body class="animated-bg min-h-screen flex flex-col justify-between py-6">
+<body class="animated-bg min-h-screen flex flex-col justify-between py-6 relative">
+
+    <!-- SKRIN KELABU AMARAN KEDAI TUTUP (Dikawal secara Real-Time oleh Admin) -->
+    <div id="closed-banner" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-6 text-center">
+        <div class="glass-card max-w-md p-8 rounded-3xl border border-red-500/30 space-y-4 shadow-2xl">
+            <div class="w-16 h-16 bg-red-500/20 text-red-400 rounded-2xl flex items-center justify-center text-3xl mx-auto border border-red-500/30">
+                <i class="fa-solid fa-store-slash"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-white">Kedai Sedang Ditutup</h2>
+            <p class="text-xs text-slate-400 leading-relaxed">Harap maaf, sistem pesanan dalam talian Cetak Tinta kini ditutup buat sementara waktu oleh pihak admin. Sila cuba lagi kemudian apabila kedai dibuka semula.</p>
+            <a href="dashboard.html" class="inline-block w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-white/10 transition">
+                Kembali ke Dashboard
+            </a>
+        </div>
+    </div>
 
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
@@ -141,7 +155,6 @@
                     </h2>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <!-- Jenis Cetakan warna/hitam putih -->
                         <div>
                             <label class="block text-xs text-slate-300 font-semibold mb-1">Pilihan Warna</label>
                             <select id="print-color" class="w-full glass-input rounded-xl py-2.5 px-3 text-sm bg-slate-900 cursor-pointer">
@@ -150,7 +163,6 @@
                             </select>
                         </div>
 
-                        <!-- Cetak Depan Belakang / 1 Bahagian -->
                         <div>
                             <label class="block text-xs text-slate-300 font-semibold mb-1">Pilihan Muka Surat Cetakan</label>
                             <select id="print-sides" class="w-full glass-input rounded-xl py-2.5 px-3 text-sm bg-slate-900 cursor-pointer">
@@ -159,13 +171,11 @@
                             </select>
                         </div>
 
-                        <!-- Bilangan Copies -->
                         <div>
                             <label class="block text-xs text-slate-300 font-semibold mb-1">Bilangan Salinan (Copies)</label>
                             <input type="number" id="order-quantity" min="1" value="1" required class="w-full glass-input rounded-xl py-2.5 px-4 text-sm">
                         </div>
 
-                        <!-- Mod Penerimaan -->
                         <div>
                             <label class="block text-xs text-slate-300 font-semibold mb-1">Mod Penerimaan</label>
                             <select id="receive-mode" class="w-full glass-input rounded-xl py-2.5 px-3 text-sm bg-slate-900 cursor-pointer">
@@ -241,7 +251,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // URL Google Apps Script Anda
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkzwL8vly8hRjrNrT-q2SsaMKULKuYoDmxSyfTTX6dNR4bOpwPKbS5RZC7m1M343yd/exec";
@@ -263,6 +273,19 @@
 
         let currentUser = null;
         let detectedPageCount = 1;
+
+        // Semak Status Kedai Secara Real-Time (Buka / Tutup)
+        const closedBanner = document.getElementById('closed-banner');
+        onSnapshot(doc(db, "settings", "store_status"), (docSnap) => {
+            if (docSnap.exists()) {
+                const isOpen = docSnap.data().isOpen;
+                if (!isOpen) {
+                    closedBanner.classList.remove('hidden');
+                } else {
+                    closedBanner.classList.add('hidden');
+                }
+            }
+        });
 
         // Auto Fill User Email bila Log In
         onAuthStateChanged(auth, (user) => {
@@ -373,10 +396,7 @@
             const copies = parseInt(quantityInput.value) || 1;
             const receiveMode = receiveModeSelect.value;
 
-            // Hitam Putih = RM0.30, Warna = RM0.60
             const ratePerPage = (colorType === 'color') ? 0.60 : 0.30;
-            
-            // KOS PENGHANTARAN = 50 SEN (RM0.50)
             const deliveryCharge = (receiveMode === 'delivery') ? 0.50 : 0.00;
 
             const totalPrintCost = (detectedPageCount * ratePerPage) * copies;
