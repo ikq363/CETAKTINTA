@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; min-h-screen: 100vh; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; min-height: 100vh; }
         .animated-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); position: relative; }
         .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
         .glass-card:hover { transform: translateY(-3px); border-color: rgba(6, 182, 212, 0.4); box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.2); }
@@ -55,8 +55,8 @@
             <p class="text-xs text-slate-400">Pilih menu di bawah untuk menguruskan tempahan cetakan dan tetapan kedai.</p>
         </div>
 
-        <!-- MENU KAD UTAMA (4 MENU) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- MENU KAD UTAMA (5 MENU) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
             <!-- 1. PESANAN MASUK -->
             <a href="admin-pesanan-masuk.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
@@ -118,8 +118,28 @@
                 </div>
             </a>
 
-            <!-- 4. URUS KEDAI -->
-            <a href="admin-urus-kedai.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+            <!-- 4. LOG HARIAN (MENU BARU) -->
+            <a href="admin-log-harian.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-blue-400 text-8xl transition transform group-hover:scale-110">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 text-xl mb-4">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-white mb-1">Log Harian</h2>
+                    <p class="text-xs text-slate-400 mb-6">Rekod sejarah aktiviti, pesanan selesai & laporan harian.</p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                    <span class="text-xs text-blue-400 font-semibold px-2 py-1 bg-blue-500/10 rounded-lg border border-blue-500/20">Rekod</span>
+                    <span class="text-xs text-blue-300 font-semibold group-hover:translate-x-1 transition flex items-center gap-1">
+                        Buka <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </div>
+            </a>
+
+            <!-- 5. URUS KEDAI -->
+            <a href="admin-urus-kedai.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group sm:col-span-2 lg:col-span-1">
                 <div class="absolute -right-4 -bottom-4 opacity-10 text-emerald-400 text-8xl transition transform group-hover:scale-110">
                     <i class="fa-solid fa-store"></i>
                 </div>
@@ -181,7 +201,7 @@
             });
         });
 
-        // Kira Bilangan Tempahan Real-Time
+        // Kira Bilangan Tempahan Real-Time (diselaraskan mengikut status Bahasa Melayu)
         onSnapshot(collection(db, "orders"), (snapshot) => {
             let countMasuk = 0;
             let countProses = 0;
@@ -189,13 +209,14 @@
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                const status = data.status || "Pending";
+                const status = data.status ? data.status.trim() : "";
 
-                if (status === "Pending") {
+                // Menyokong kedua-dua variasi status BM & BI sekiranya ada
+                if (status === "Pending" || status === "Pesanan Masuk") {
                     countMasuk++;
-                } else if (status === "Processing") {
+                } else if (status === "Processing" || status === "Dalam Proses") {
                     countProses++;
-                } else if (status === "Delivering" || status === "Ready") {
+                } else if (status === "Delivering" || status === "Ready" || status === "Penghantaran") {
                     countPenghantaran++;
                 }
             });
