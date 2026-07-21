@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Masuk & Daftar | Cetak Tinta</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* Dynamic Animated Background */
+        .animated-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            position: relative;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 8s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            top: 10%;
+            left: 10%;
+            width: 250px;
+            height: 250px;
+            background: #06b6d4; /* Cyan */
+        }
+
+        .blob-2 {
+            bottom: 10%;
+            right: 10%;
+            width: 280px;
+            height: 280px;
+            background: #a855f7; /* Magenta/Purple */
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, 30px) scale(1.1); }
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .glass-input:focus {
+            outline: none;
+            border-color: #06b6d4;
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+        }
+
+        .glow-btn {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+            transition: all 0.3s ease;
+        }
+        .glow-btn:hover {
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.7);
+        }
+
+        /* Pulse Graphic Effect */
+        .graphic-badge {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+    </style>
+</head>
+<body class="animated-bg min-h-screen flex flex-col justify-between items-center relative py-4">
+
+    <!-- Background Animated Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Header Logo Navigation -->
+    <header class="w-full max-w-7xl px-6 py-4 flex justify-between items-center z-10">
+        <a href="index.html" class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-purple-500 to-yellow-400 p-0.5 flex items-center justify-center shadow-lg">
+                <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                    <i class="fa-solid fa-print text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-xl"></i>
+                </div>
+            </div>
+            <span class="text-2xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400">
+                CETAK TINTA
+            </span>
+        </a>
+        <a href="index.html" class="text-xs text-slate-400 hover:text-cyan-400 transition flex items-center space-x-1">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Kembali ke Utama</span>
+        </a>
+    </header>
+
+    <!-- Main Auth Container -->
+    <main class="w-full max-w-md px-4 py-4 z-10 my-auto">
+        <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            
+            <!-- Top Graphic Icon Header -->
+            <div class="flex flex-col items-center justify-center mb-6 text-center">
+                <div class="graphic-badge w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 to-purple-600 p-0.5 flex items-center justify-center mb-3">
+                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center">
+                        <i id="graphic-icon" class="fa-solid fa-user-shield text-2xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"></i>
+                    </div>
+                </div>
+                <!-- Address Badge -->
+                <p class="text-[10px] text-cyan-400 font-semibold uppercase tracking-widest bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">
+                    <i class="fa-solid fa-building mr-1"></i> Pengurusan: Blok 7, Aras 4, Bilik 18
+                </p>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="flex rounded-xl bg-slate-900/70 p-1 border border-white/10 mb-6">
+                <button id="tab-login-btn" onclick="switchTab('login')" class="flex-1 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md">
+                    <i class="fa-solid fa-right-to-bracket mr-1"></i> Log Masuk
+                </button>
+                <button id="tab-signup-btn" onclick="switchTab('signup')" class="flex-1 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-user-plus mr-1"></i> Daftar Akaun
+                </button>
+            </div>
+
+            <!-- Alert Message Box -->
+            <div id="alert-box" class="hidden p-3 rounded-xl mb-4 text-xs font-semibold flex items-center space-x-2"></div>
+
+            <!-- 1. LOGIN FORM -->
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">E-mel</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="email" id="login-email" required placeholder="nama@email.com" class="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">Kata Laluan</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm">
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-login-submit" class="glow-btn w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-sm hover:opacity-90 transition mt-2 flex items-center justify-center space-x-2">
+                    <span>Log Masuk</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- 2. SIGNUP FORM -->
+            <form id="signup-form" class="space-y-3.5 hidden">
+                <!-- Nama Penuh Field -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">Nama Penuh</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="text" id="signup-name" required placeholder="Ahmad Ali" class="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm">
+                    </div>
+                </div>
+
+                <!-- Email Field -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">E-mel</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="email" id="signup-email" required placeholder="nama@email.com" class="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm">
+                    </div>
+                </div>
+
+                <!-- Phone Field -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">Nombor Telefon</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-phone absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="tel" id="signup-phone" required placeholder="0123456789" class="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm">
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">Kata Laluan</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="password" id="signup-password" required minlength="6" placeholder="Sekurang-kurangnya 6 aksara" class="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm">
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-signup-submit" class="glow-btn w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-sm hover:opacity-90 transition mt-2 flex items-center justify-center space-x-2">
+                    <span>Daftar Akaun</span>
+                    <i class="fa-solid fa-user-plus"></i>
+                </button>
+            </form>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-2 text-center text-slate-500 text-xs z-10">
+        &copy; 2026 Cetak Tinta. Hak Cipta Terpelihara.
+    </footer>
+
+    <!-- Firebase Script (Modular SDK v10+) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
+            authDomain: "cetaktinta-bb755.firebaseapp.com",
+            projectId: "cetaktinta-bb755",
+            storageBucket: "cetaktinta-bb755.firebasestorage.app",
+            messagingSenderId: "439592324038",
+            appId: "1:439592324038:web:4ab89ce9706447809240c7",
+            measurementId: "G-X9ZEL7PEJV"
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Utility: Alert Box Function
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.classList.remove('hidden', 'bg-red-500/20', 'border-red-500/50', 'text-red-300', 'bg-green-500/20', 'border-green-500/50', 'text-green-300');
+            
+            if (type === 'error') {
+                alertBox.classList.add('bg-red-500/20', 'border', 'border-red-500/50', 'text-red-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${message}</span>`;
+            } else {
+                alertBox.classList.add('bg-green-500/20', 'border', 'border-green-500/50', 'text-green-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+            }
+        }
+
+        // Tab Switcher Function
+        window.switchTab = function(tab) {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const loginBtn = document.getElementById('tab-login-btn');
+            const signupBtn = document.getElementById('tab-signup-btn');
+            const graphicIcon = document.getElementById('graphic-icon');
+            const alertBox = document.getElementById('alert-box');
+
+            alertBox.classList.add('hidden');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                graphicIcon.className = "fa-solid fa-user-shield text-2xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400";
+                loginBtn.className = "flex-1 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md";
+                signupBtn.className = "flex-1 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition text-slate-400 hover:text-white";
+            } else {
+                signupForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                graphicIcon.className = "fa-solid fa-id-card text-2xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400";
+                signupBtn.className = "flex-1 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition bg-gradient-to-r from-cyan-500 to-purple-600 text-white shadow-md";
+                loginBtn.className = "flex-1 py-2.5 rounded-lg text-xs sm:text-sm font-bold transition text-slate-400 hover:text-white";
+            }
+        }
+
+        // --- 1. SIGNUP PROCESS ---
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const phone = document.getElementById('signup-phone').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const btnSubmit = document.getElementById('btn-signup-submit');
+
+            try {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Mendaftarkan...</span>`;
+
+                // 1. Cipta akaun pengguna di Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Simpan profil lengkap (Nama, Email, Phone) di Firestore DB
+                await setDoc(doc(db, "users", user.uid), {
+                    uid: user.uid,
+                    fullName: fullName,
+                    email: email,
+                    phone: phone,
+                    createdAt: serverTimestamp()
+                });
+
+                showAlert("Pendaftaran berjaya! Mengalihkan...", "success");
+                
+                setTimeout(() => {
+                    window.location.href = "order.html"; // Mengarah ke halaman tempahan
+                }, 1500);
+
+            } catch (error) {
+                console.error(error);
+                let msg = "Pendaftaran gagal. Sila cuba lagi.";
+                if (error.code === 'auth/email-already-in-use') {
+                    msg = "E-mel ini telah pun didaftarkan.";
+                } else if (error.code === 'auth/weak-password') {
+                    msg = "Kata laluan terlalu lemah (minimum 6 aksara).";
+                }
+                showAlert(msg, 'error');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<span>Daftar Akaun</span> <i class="fa-solid fa-user-plus"></i>`;
+            }
+        });
+
+        // --- 2. LOGIN PROCESS ---
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const btnSubmit = document.getElementById('btn-login-submit');
+
+            try {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memproses...</span>`;
+
+                // Log masuk guna Firebase Auth
+                await signInWithEmailAndPassword(auth, email, password);
+                
+                showAlert("Log masuk berjaya! Mengalihkan...", "success");
+
+                setTimeout(() => {
+                    window.location.href = "order.html"; // Mengarah ke halaman tempahan
+                }, 1500);
+
+            } catch (error) {
+                console.error(error);
+                let msg = "E-mel atau kata laluan tidak sah.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    msg = "E-mel atau kata laluan salah.";
+                }
+                showAlert(msg, 'error');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<span>Log Masuk</span> <i class="fa-solid fa-arrow-right"></i>`;
+            }
+        });
+    </script>
+</body>
+</html>
