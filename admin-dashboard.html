@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin | Cetak Tinta</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; min-h-screen: 100vh; }
+        .animated-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); position: relative; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+        .glass-card:hover { transform: translateY(-3px); border-color: rgba(6, 182, 212, 0.4); box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.2); }
+        .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.25; pointer-events: none; }
+        .blob-1 { top: 5%; left: 5%; width: 300px; height: 300px; background: #06b6d4; }
+        .blob-2 { bottom: 5%; right: 5%; width: 350px; height: 350px; background: #a855f7; }
+    </style>
+</head>
+<body class="animated-bg min-h-screen flex flex-col justify-between py-6">
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Header Navigation -->
+    <header class="w-full max-w-6xl mx-auto px-6 flex justify-between items-center mb-8 z-10">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-purple-500 to-yellow-400 p-0.5 flex items-center justify-center shadow-lg">
+                <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                    <i class="fa-solid fa-user-shield text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-xl"></i>
+                </div>
+            </div>
+            <div>
+                <span class="text-2xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400">
+                    CETAK TINTA
+                </span>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-cyan-400 block -mt-1">Portal Pentadbir (Admin)</span>
+            </div>
+        </div>
+
+        <button id="btn-logout" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-4 py-2 rounded-xl border border-red-500/30 transition flex items-center gap-2">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Log Keluar</span>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-6xl mx-auto px-6 my-auto z-10">
+        <div class="mb-8">
+            <h1 class="text-3xl font-extrabold text-white mb-2">Selamat Datang, Admin! 👋</h1>
+            <p class="text-xs text-slate-400">Pilih menu di bawah untuk menguruskan tempahan cetakan pelanggan.</p>
+        </div>
+
+        <!-- MENU KAD UTAMA (3 MENU) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- 1. PESANAN MASUK -->
+            <a href="admin-pesanan-masuk.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-cyan-400 text-9xl transition transform group-hover:scale-110">
+                    <i class="fa-solid fa-inbox"></i>
+                </div>
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl mb-4">
+                        <i class="fa-solid fa-bell-concierge"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-white mb-1">Pesanan Masuk</h2>
+                    <p class="text-xs text-slate-400 mb-6">Tempahan baru yang perlu disahkan dan disemak dokumen.</p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                    <span id="count-masuk" class="text-2xl font-black text-cyan-400">0</span>
+                    <span class="text-xs text-cyan-300 font-semibold group-hover:translate-x-1 transition flex items-center gap-1">
+                        Urus Pesanan <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </div>
+            </a>
+
+            <!-- 2. PESANAN DALAM PROSES -->
+            <a href="admin-pesanan-proses.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-yellow-400 text-9xl transition transform group-hover:scale-110">
+                    <i class="fa-solid fa-print"></i>
+                </div>
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center text-yellow-400 text-xl mb-4">
+                        <i class="fa-solid fa-gears"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-white mb-1">Dalam Proses</h2>
+                    <p class="text-xs text-slate-400 mb-6">Tempahan yang sedang dicetak atau siap diproses.</p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                    <span id="count-proses" class="text-2xl font-black text-yellow-400">0</span>
+                    <span class="text-xs text-yellow-300 font-semibold group-hover:translate-x-1 transition flex items-center gap-1">
+                        Urus Proses <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </div>
+            </a>
+
+            <!-- 3. PESANAN DALAM PENGHANTARAN -->
+            <a href="admin-pesanan-penghantaran.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-purple-400 text-9xl transition transform group-hover:scale-110">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl mb-4">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-white mb-1">Dalam Penghantaran</h2>
+                    <p class="text-xs text-slate-400 mb-6">Tempahan sedia untuk di-pickup atau sedang dihantar.</p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                    <span id="count-penghantaran" class="text-2xl font-black text-purple-400">0</span>
+                    <span class="text-xs text-purple-300 font-semibold group-hover:translate-x-1 transition flex items-center gap-1">
+                        Urus Penghantaran <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-slate-500 text-xs z-10">
+        &copy; 2026 Cetak Tinta Admin System. Hak Cipta Terpelihara.
+    </footer>
+
+    <!-- Firebase Admin Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
+            authDomain: "cetaktinta-bb755.firebaseapp.com",
+            projectId: "cetaktinta-bb755",
+            storageBucket: "cetaktinta-bb755.firebasestorage.app",
+            messagingSenderId: "439592324038",
+            appId: "1:439592324038:web:4ab89ce9706447809240c7",
+            measurementId: "G-X9ZEL7PEJV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Semak status Log In
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            }
+        });
+
+        // Butang Logout
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "login.html";
+            });
+        });
+
+        // Kira Bilangan Tempahan Real-Time
+        onSnapshot(collection(db, "orders"), (snapshot) => {
+            let countMasuk = 0;
+            let countProses = 0;
+            let countPenghantaran = 0;
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const status = data.status || "Pending";
+
+                if (status === "Pending") {
+                    countMasuk++;
+                } else if (status === "Processing") {
+                    countProses++;
+                } else if (status === "Delivering" || status === "Ready") {
+                    countPenghantaran++;
+                }
+            });
+
+            document.getElementById('count-masuk').textContent = countMasuk;
+            document.getElementById('count-proses').textContent = countProses;
+            document.getElementById('count-penghantaran').textContent = countPenghantaran;
+        });
+    </script>
+</body>
+</html>
