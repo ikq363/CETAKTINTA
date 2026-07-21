@@ -118,7 +118,7 @@
                 </div>
             </a>
 
-            <!-- 4. LOG HARIAN (MENU BARU) -->
+            <!-- 4. LOG HARIAN -->
             <a href="admin-log-harian.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
                 <div class="absolute -right-4 -bottom-4 opacity-10 text-blue-400 text-8xl transition transform group-hover:scale-110">
                     <i class="fa-solid fa-clipboard-list"></i>
@@ -172,7 +172,6 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Konfigurasi Firebase Anda
         const firebaseConfig = {
             apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
             authDomain: "cetaktinta-bb755.firebaseapp.com",
@@ -201,7 +200,7 @@
             });
         });
 
-        // Kira Bilangan Tempahan Real-Time (diselaraskan mengikut status Bahasa Melayu)
+        // Kira Bilangan Tempahan Real-Time (Menyokong variasi status "Proses" atau "Dalam Proses")
         onSnapshot(collection(db, "orders"), (snapshot) => {
             let countMasuk = 0;
             let countProses = 0;
@@ -211,10 +210,9 @@
                 const data = doc.data();
                 const status = data.status ? data.status.trim() : "";
 
-                // Menyokong kedua-dua variasi status BM & BI sekiranya ada
                 if (status === "Pending" || status === "Pesanan Masuk") {
                     countMasuk++;
-                } else if (status === "Processing" || status === "Dalam Proses") {
+                } else if (status === "Proses" || status === "Dalam Proses" || status === "Processing") {
                     countProses++;
                 } else if (status === "Delivering" || status === "Ready" || status === "Penghantaran") {
                     countPenghantaran++;
