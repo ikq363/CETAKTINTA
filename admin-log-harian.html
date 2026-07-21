@@ -58,13 +58,13 @@
                 <h1 class="text-2xl font-extrabold text-white flex items-center gap-2">
                     <i class="fa-solid fa-clipboard-list text-blue-400"></i> Rekod Log Harian
                 </h1>
-                <p class="text-xs text-slate-400 mt-1">Senarai pesanan yang telah selesai atau berada dalam proses penghantaran.</p>
+                <p class="text-xs text-slate-400 mt-1">Senarai pesanan yang telah selesai disahkan penghantarannya.</p>
             </div>
 
             <!-- Kad Counting Jumlah Duit Masuk -->
             <div class="glass-card glow-box rounded-2xl p-4 border border-blue-500/30 flex items-center justify-between bg-gradient-to-r from-blue-900/20 to-purple-900/20">
                 <div>
-                    <p class="text-[11px] font-semibold text-blue-300 uppercase tracking-wider">Jumlah Kutipan (Penghantaran)</p>
+                    <p class="text-[11px] font-semibold text-blue-300 uppercase tracking-wider">Jumlah Kutipan (Selesai)</p>
                     <h2 class="text-2xl font-black text-white mt-0.5">RM <span id="total-revenue">0.00</span></h2>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/40 text-blue-400 flex items-center justify-center text-xl">
@@ -87,7 +87,7 @@
                 <i class="fa-solid fa-folder-open"></i>
             </div>
             <h3 class="text-base font-bold text-white mb-1">Tiada Log Harian</h3>
-            <p class="text-xs text-slate-400">Belum ada sebarang pesanan yang ditukar ke status Penghantaran.</p>
+            <p class="text-xs text-slate-400">Belum ada pesanan yang ditekan butang selesai penghantaran.</p>
         </div>
     </main>
 
@@ -153,14 +153,14 @@
                         const order = docSnap.data();
                         const status = order.status ? order.status.trim() : "";
 
-                        // Ambil pesanan yang masuk fasa penghantaran / selesai
-                        if (status === "Penghantaran" || status === "Delivering" || status === "Ready") {
+                        // SYARAT BARU: Hanya ambil pesanan yang statusnya "Selesai" (selepas butang selesai penghantaran ditekan)
+                        if (status === "Selesai" || status === "Completed") {
                             logList.push({ id: docSnap.id, ...order });
                             totalRevenue += Number(order.totalPrice || 0);
                         }
                     });
 
-                    // Paparkan jumlah kutipan duit
+                    // Paparkan jumlah kutipan duit keseluruhan untuk pesanan selesai
                     totalRevenueEl.textContent = totalRevenue.toFixed(2);
 
                     if (logList.length === 0) {
@@ -172,8 +172,8 @@
 
                     logList.forEach((order, index) => {
                         let dateFormatted = 'Baru sahaja';
-                        if (order.shippedAt && order.shippedAt.seconds) {
-                            dateFormatted = new Date(order.shippedAt.seconds * 1000).toLocaleString('ms-MY', { 
+                        if (order.completedAt && order.completedAt.seconds) {
+                            dateFormatted = new Date(order.completedAt.seconds * 1000).toLocaleString('ms-MY', { 
                                 dateStyle: 'medium', 
                                 timeStyle: 'short' 
                             });
@@ -189,14 +189,14 @@
 
                         listItem.innerHTML = `
                             <div class="flex items-center gap-3.5 w-full sm:w-auto">
-                                <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center justify-center font-bold text-xs shrink-0">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center font-bold text-xs shrink-0">
                                     #${index + 1}
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <h3 class="text-xs font-bold text-white">${order.recipientName || 'Tanpa Nama'}</h3>
-                                        <span class="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full font-semibold">
-                                            ${order.status || 'Penghantaran'}
+                                        <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold">
+                                            ${order.status || 'Selesai'}
                                         </span>
                                     </div>
                                     <p class="text-[11px] text-slate-400 mt-0.5"><i class="fa-solid fa-phone text-[10px] mr-1"></i> ${order.recipientPhone || '-'} &bull; <i class="fa-regular fa-calendar ml-1"></i> ${dateFormatted}</p>
