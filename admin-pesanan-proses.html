@@ -246,7 +246,7 @@
             }
         }
 
-        // Fungsi Global: Tukar Status ke "Penghantaran" atau "Selesai"
+        // Fungsi Global: Tukar Status ke "Penghantaran"
         window.updateToShipping = async function(orderId, customerName) {
             if (!confirm(`Tukar status pesanan ${customerName} kepada "Penghantaran / Selesai"?`)) {
                 return;
@@ -255,7 +255,7 @@
             try {
                 const orderRef = doc(db, "orders", orderId);
                 await updateDoc(orderRef, {
-                    status: "Penghantaran", // atau "Selesai"
+                    status: "Penghantaran",
                     shippedAt: serverTimestamp()
                 });
                 showAlert(`Pesanan ${customerName} telah dikemas kini ke status Penghantaran!`, "success");
