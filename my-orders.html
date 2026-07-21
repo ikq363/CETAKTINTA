@@ -108,7 +108,6 @@
 
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                // Jika belum log masuk, arahkan ke halaman log masuk pengguna
                 window.location.href = "login.html"; 
             } else {
                 loadUserOrders(user.uid);
@@ -131,7 +130,6 @@
 
         function loadUserOrders(userId) {
             try {
-                // Menapis pesanan berdasarkan UID pengguna yang sedang log masuk
                 const q = query(collection(db, "orders"), where("userId", "==", userId));
 
                 onSnapshot(q, (snapshot) => {
@@ -149,7 +147,7 @@
 
                     emptyState.classList.add('hidden');
 
-                    orders.forEach((order, index) => {
+                    orders.forEach((order) => {
                         let dateFormatted = 'Baru sahaja';
                         if (order.createdAt && order.createdAt.seconds) {
                             dateFormatted = new Date(order.createdAt.seconds * 1000).toLocaleString('ms-MY', { 
@@ -158,14 +156,13 @@
                             });
                         }
 
-                        // Menentukan warna dan teks status berdasarkan padanan pangkalan data
                         let rawStatus = order.status ? order.status.trim() : "Pending";
                         let statusBadge = "";
                         let canCancel = false;
 
                         if (rawStatus === "Pending" || rawStatus === "Pesanan Masuk") {
                             statusBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Belum Diproses</span>`;
-                            canCancel = true; // Hanya boleh batalkan jika status masih belum diproses/pending
+                            canCancel = true; 
                         } else if (rawStatus === "Proses" || rawStatus === "Dalam Proses" || rawStatus === "Processing") {
                             statusBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"><i class="fa-solid fa-print animate-pulse mr-1"></i> Sedang Diproses (Tengah Print)</span>`;
                         } else if (rawStatus === "Penghantaran" || rawStatus === "Delivering" || rawStatus === "Ready") {
@@ -234,7 +231,6 @@
             }
         }
 
-        // Fungsi Global untuk Batalkan Pesanan
         window.cancelOrder = async function(orderId) {
             if (!confirm("Adakah anda pasti mahu membatalkan pesanan ini?")) return;
             try {
