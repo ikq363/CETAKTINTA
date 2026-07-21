@@ -91,11 +91,11 @@
         &copy; 2026 Cetak Tinta Admin System. Hak Cipta Terpelihara.
     </footer>
 
-    <!-- Firebase SDK & Logik Pemaparan Data -->
+    <!-- Firebase SDK & Logik Pemaparan Data menggunakan Firestore Query -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
@@ -117,10 +117,8 @@
 
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                console.log("Pengguna belum log masuk. Redirect ke login...");
                 window.location.href = "admin-login.html";
             } else {
-                console.log("Pengguna disahkan. Memuatkan data pesanan proses...");
                 loadProcessOrders();
             }
         });
@@ -141,32 +139,17 @@
 
         function loadProcessOrders() {
             try {
-                // Membaca koleksi 'orders' dari Firestore secara real-time
-                onSnapshot(collection(db, "orders"), (snapshot) => {
+                // Query terus dari koleksi 'orders' di mana status == 'Dalam Proses'
+                const q = query(collection(db, "orders"), where("status", "==", "Dalam Proses"));
+
+                onSnapshot(q, (snapshot) => {
                     ordersGrid.innerHTML = "";
                     let processList = [];
 
-                    console.log(`Jumlah keseluruhan dokumen dalam koleksi 'orders': ${snapshot.size}`);
-
                     snapshot.forEach((docSnap) => {
-                        const order = docSnap.data();
-                        const status = order.status ? order.status.trim() : "TIADA STATUS";
-                        
-                        // Cetak status setiap dokumen ke Console untuk semakan anda
-                        console.log(`ID: ${docSnap.id} | Status ditemui: "${status}"`);
-
-                        // Semak pelbagai variasi ejaan status yang mungkin dihantar
-                        if (
-                            status === "Dalam Proses" || 
-                            status === "Processing" || 
-                            status.toLowerCase() === "dalam proses" ||
-                            status.toLowerCase() === "processing"
-                        ) {
-                            processList.push({ id: docSnap.id, ...order });
-                        }
+                        processList.push({ id: docSnap.id, ...docSnap.data() });
                     });
 
-                    console.log(`Jumlah pesanan yang melepasi tapisan Dalam Proses: ${processList.length}`);
                     processCountEl.textContent = processList.length;
 
                     if (processList.length === 0) {
@@ -234,11 +217,13 @@
                                 </a>
 
                                 <div class="grid grid-cols-2 gap-2">
+                                    <!-- Butang Tukar ke Penghantaran -->
                                     <button onclick="updateToShipping('${order.id}', '${order.recipientName || 'Pelanggan'}')" class="glow-btn-purple py-2.5 px-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold text-[11px] hover:opacity-90 transition flex items-center justify-center gap-1.5">
                                         <i class="fa-solid fa-truck-fast"></i>
                                         <span>Penghantaran</span>
                                     </button>
 
+                                    <!-- Butang Padam Order -->
                                     <button onclick="deleteOrder('${order.id}', '${order.recipientName || 'Pelanggan'}')" class="py-2.5 px-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 font-bold text-[11px] transition flex items-center justify-center gap-1.5">
                                         <i class="fa-solid fa-trash-can"></i>
                                         <span>Padam</span>
@@ -249,15 +234,16 @@
                         ordersGrid.appendChild(card);
                     });
                 }, (error) => {
-                    console.error("Ralat Sambungan Firestore:", error);
-                    showAlert("Ralat pangkalan data: " + error.message, "error");
+                    console.error("Ralat Query Firestore:", error);
+                    showAlert("Ralat membaca data: " + error.message, "error");
                 });
 
             } catch (err) {
-                console.error("Ralat membaca data:", err);
+                console.error("Ralat sistem:", err);
             }
         }
 
+        // Fungsi Global: Tukar Status ke "Penghantaran"
         window.updateToShipping = async function(orderId, customerName) {
             if (!confirm(`Tukar status pesanan ${customerName} kepada "Penghantaran"?`)) return;
             try {
@@ -273,6 +259,7 @@
             }
         }
 
+        // Fungsi Global: Padam (Delete) Order
         window.deleteOrder = async function(orderId, customerName) {
             if (!confirm(`AMARAN: Anda pasti mahu MEMADAM pesanan daripada ${customerName}?`)) return;
             try {
