@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Cetak Tinta</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* Dynamic Animated Background */
+        .animated-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            position: relative;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.35;
+            animation: float 8s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            top: 10%;
+            left: 5%;
+            width: 250px;
+            height: 250px;
+            background: #06b6d4; /* Cyan */
+        }
+
+        .blob-2 {
+            bottom: 10%;
+            right: 5%;
+            width: 280px;
+            height: 280px;
+            background: #a855f7; /* Purple */
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, 30px) scale(1.1); }
+        }
+
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-sidebar {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Hover animations */
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+    </style>
+</head>
+<body class="animated-bg min-h-screen flex flex-col md:flex-row">
+
+    <!-- Background Animated Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- ================= 1. SIDEBAR (DESKTOP & TABLET) ================= -->
+    <aside class="hidden md:flex flex-col w-64 glass-sidebar min-h-screen p-5 z-20 sticky top-0 justify-between">
+        <div class="space-y-8">
+            <!-- Brand Logo -->
+            <a href="dashboard.html" class="flex items-center space-x-3 px-2">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-purple-500 to-yellow-400 p-0.5 flex items-center justify-center shadow-lg">
+                    <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                        <i class="fa-solid fa-print text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-xl"></i>
+                    </div>
+                </div>
+                <span class="text-xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400">
+                    CETAK TINTA
+                </span>
+            </a>
+
+            <!-- Address Tag -->
+            <div class="p-3 rounded-xl glass-card border border-cyan-500/20 text-[11px] text-cyan-300 flex items-center space-x-2">
+                <i class="fa-solid fa-building text-sm text-cyan-400 flex-shrink-0"></i>
+                <div>
+                    <p class="font-semibold text-white">Bilik Pengurusan</p>
+                    <p class="text-[10px] text-slate-400">Blok 7, Aras 4, Bilik 18</p>
+                </div>
+            </div>
+
+            <!-- Main Menu Navigation -->
+            <nav class="space-y-2">
+                <p class="text-[10px] uppercase font-bold text-slate-500 tracking-wider px-3 mb-2">Menu Utama</p>
+                
+                <!-- Dashboard (Active) -->
+                <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-gradient-to-r from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 text-cyan-300 font-bold text-sm">
+                    <i class="fa-solid fa-chart-pie text-cyan-400 w-5"></i>
+                    <span>Utama</span>
+                </a>
+
+                <!-- 1. Tambah Pesanan -->
+                <a href="order.html" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 font-medium text-sm hover:text-white">
+                    <i class="fa-solid fa-cart-plus text-purple-400 w-5"></i>
+                    <span>Tambah Pesanan</span>
+                </a>
+
+                <!-- 2. Pesanan Saya -->
+                <a href="my-orders.html" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 font-medium text-sm hover:text-white">
+                    <i class="fa-solid fa-folder-open text-yellow-400 w-5"></i>
+                    <span>Pesanan Saya</span>
+                </a>
+
+                <!-- 3. Profile Saya -->
+                <a href="profile.html" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 font-medium text-sm hover:text-white">
+                    <i class="fa-solid fa-user-gear text-pink-400 w-5"></i>
+                    <span>Profile Saya</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Logout Button -->
+        <button id="logout-btn-desktop" class="w-full flex items-center justify-center space-x-2 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 font-bold text-sm transition">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Log Keluar</span>
+        </button>
+    </aside>
+
+    <!-- ================= 2. MOBILE TOP BAR ================= -->
+    <header class="md:hidden glass-nav sticky top-0 z-30 px-4 py-3 flex justify-between items-center">
+        <a href="dashboard.html" class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-purple-500 p-0.5 flex items-center justify-center">
+                <div class="w-full h-full bg-slate-900 rounded-[6px] flex items-center justify-center">
+                    <i class="fa-solid fa-print text-cyan-400 text-xs"></i>
+                </div>
+            </div>
+            <span class="text-lg font-bold text-white tracking-wider">CETAK TINTA</span>
+        </a>
+        <button id="logout-btn-mobile" class="text-xs text-red-400 font-bold px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20">
+            <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+        </button>
+    </header>
+
+    <!-- ================= 3. MAIN DASHBOARD CONTENT ================= -->
+    <main class="flex-1 p-4 sm:p-8 max-w-6xl mx-auto z-10 w-full mb-20 md:mb-0">
+        
+        <!-- Welcome User Card -->
+        <div class="glass-card rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl relative overflow-hidden mb-8">
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl"></div>
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
+                <div>
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-semibold mb-3">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                        <span>Selamat Datang</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold text-white">
+                        Hai, <span id="user-display-name" class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400">Pengguna</span> 👋
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1" id="user-display-email">Memuat maklumat akaun...</p>
+                </div>
+
+                <!-- Quick Action Callout -->
+                <a href="order.html" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-xs sm:text-sm shadow-lg hover:opacity-90 transition space-x-2">
+                    <i class="fa-solid fa-circle-plus"></i>
+                    <span>Cipta Pesanan Baru</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Dashboard Shortcut Cards Grid -->
+        <h2 class="text-base sm:text-lg font-bold text-slate-200 mb-4 flex items-center space-x-2">
+            <i class="fa-solid fa-compass text-cyan-400"></i>
+            <span>Pilihan Akses Pantas</span>
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            
+            <!-- Card 1: Tambah Pesanan -->
+            <a href="order.html" class="glass-card p-5 rounded-2xl border border-white/10 hover:border-cyan-500/50 transition group shadow-xl">
+                <div class="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl mb-4 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-cart-plus"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-cyan-400 transition">Tambah Pesanan</h3>
+                <p class="text-xs text-slate-400 mt-1">Muat naik dokumen PDF/Word untuk cetakan baru.</p>
+                <div class="mt-4 text-xs font-semibold text-cyan-400 flex items-center space-x-1">
+                    <span>Tempah Sekarang</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </div>
+            </a>
+
+            <!-- Card 2: Pesanan Saya -->
+            <a href="my-orders.html" class="glass-card p-5 rounded-2xl border border-white/10 hover:border-purple-500/50 transition group shadow-xl">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl mb-4 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-purple-400 transition">Pesanan Saya</h3>
+                <p class="text-xs text-slate-400 mt-1">Semak status tempahan & sejarah cetakan anda.</p>
+                <div class="mt-4 text-xs font-semibold text-purple-400 flex items-center space-x-1">
+                    <span>Semak Status</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </div>
+            </a>
+
+            <!-- Card 3: Profile Saya -->
+            <a href="profile.html" class="glass-card p-5 rounded-2xl border border-white/10 hover:border-pink-500/50 transition group shadow-xl">
+                <div class="w-12 h-12 rounded-xl bg-pink-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400 text-xl mb-4 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-pink-400 transition">Profile Saya</h3>
+                <p class="text-xs text-slate-400 mt-1">Kemas kini nama, nombor telefon & maklumat akaun.</p>
+                <div class="mt-4 text-xs font-semibold text-pink-400 flex items-center space-x-1">
+                    <span>Kemaskini</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Info Card: Rates Reminder -->
+        <div class="glass-card p-5 rounded-2xl border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 rounded-xl bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 flex items-center justify-center text-lg flex-shrink-0">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <div class="text-center sm:text-left">
+                    <p class="text-xs font-bold text-white">Kadar Harga Cetakan Cetak Tinta</p>
+                    <p class="text-[11px] text-slate-400">Black & White: <b>30 sen</b> | Warna: <b>60 sen</b> | Cas Delivery: <b>50 sen</b></p>
+                </div>
+            </div>
+            <div class="text-xs text-slate-400 font-semibold bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
+                <i class="fa-solid fa-building mr-1 text-cyan-400"></i> Blok 7, Aras 4, Bilik 18
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ================= 4. MOBILE BOTTOM NAVIGATION BAR ================= -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full glass-nav border-t border-white/10 z-30 px-6 py-2 flex justify-around items-center">
+        <!-- Dashboard -->
+        <a href="dashboard.html" class="flex flex-col items-center text-cyan-400 font-bold">
+            <i class="fa-solid fa-chart-pie text-lg"></i>
+            <span class="text-[10px] mt-1">Utama</span>
+        </a>
+
+        <!-- 1. Tambah Pesanan -->
+        <a href="order.html" class="flex flex-col items-center text-slate-400 hover:text-white">
+            <i class="fa-solid fa-cart-plus text-lg"></i>
+            <span class="text-[10px] mt-1">Order</span>
+        </a>
+
+        <!-- 2. Pesanan Saya -->
+        <a href="my-orders.html" class="flex flex-col items-center text-slate-400 hover:text-white">
+            <i class="fa-solid fa-folder-open text-lg"></i>
+            <span class="text-[10px] mt-1">Pesanan</span>
+        </a>
+
+        <!-- 3. Profile Saya -->
+        <a href="profile.html" class="flex flex-col items-center text-slate-400 hover:text-white">
+            <i class="fa-solid fa-user-gear text-lg"></i>
+            <span class="text-[10px] mt-1">Profile</span>
+        </a>
+    </nav>
+
+    <!-- Firebase SDK Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
+            authDomain: "cetaktinta-bb755.firebaseapp.com",
+            projectId: "cetaktinta-bb755",
+            storageBucket: "cetaktinta-bb755.firebasestorage.app",
+            messagingSenderId: "439592324038",
+            appId: "1:439592324038:web:4ab89ce9706447809240c7",
+            measurementId: "G-X9ZEL7PEJV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Semak Sesi Pengguna Log Masuk
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Pengguna Wujud
+                document.getElementById('user-display-email').innerText = user.email;
+
+                try {
+                    // Ambil Maklumat Nama dari Firestore
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (userData.fullName) {
+                            document.getElementById('user-display-name').innerText = userData.fullName;
+                        }
+                    }
+                } catch (error) {
+                    console.error("Gagal mengambil data profil:", error);
+                }
+
+            } else {
+                // Jika belum log masuk, redirect ke login.html
+                window.location.href = "login.html";
+            }
+        });
+
+        // Fungsi Log Keluar (Logout)
+        const handleLogout = async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "login.html";
+            } catch (error) {
+                alert("Gagal log keluar. Sila cuba lagi.");
+            }
+        };
+
+        document.getElementById('logout-btn-desktop').addEventListener('click', handleLogout);
+        document.getElementById('logout-btn-mobile').addEventListener('click', handleLogout);
+    </script>
+</body>
+</html>
