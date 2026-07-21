@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tempahan Baru | Cetak Tinta</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; overflow-x: hidden; }
+        .animated-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); position: relative; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-input { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; transition: all 0.3s ease; }
+        .glass-input:focus { outline: none; border-color: #06b6d4; box-shadow: 0 0 12px rgba(6, 182, 212, 0.4); }
+        .glow-btn { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); transition: all 0.3s ease; }
+        .glow-btn:hover { box-shadow: 0 0 25px rgba(168, 85, 247, 0.7); }
+        
+        /* Background Animated Blobs */
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; pointer-events: none; }
+        .blob-1 { top: 5%; left: 5%; width: 250px; height: 250px; background: #06b6d4; }
+        .blob-2 { bottom: 5%; right: 5%; width: 280px; height: 280px; background: #a855f7; }
+    </style>
+</head>
+<body class="animated-bg min-h-screen flex flex-col justify-between py-6">
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Header Navigation -->
+    <header class="w-full max-w-4xl mx-auto px-6 flex justify-between items-center mb-6 z-10">
+        <a href="dashboard.html" class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-purple-500 to-yellow-400 p-0.5 flex items-center justify-center shadow-lg">
+                <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                    <i class="fa-solid fa-print text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-xl"></i>
+                </div>
+            </div>
+            <span class="text-2xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400">
+                CETAK TINTA
+            </span>
+        </a>
+        <a href="dashboard.html" class="text-xs text-slate-400 hover:text-cyan-400 transition flex items-center gap-1">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Kembali ke Dashboard</span>
+        </a>
+    </header>
+
+    <!-- Main Order Form -->
+    <main class="w-full max-w-2xl mx-auto px-4 my-auto z-10">
+        <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-white flex items-center gap-2 mb-1">
+                    <i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Buat Tempahan Cetak
+                </h1>
+                <p class="text-xs text-slate-400">Isi maklumat tempahan dan muat naik dokumen anda di bawah.</p>
+            </div>
+
+            <!-- Alert Notification Box -->
+            <div id="alert-box" class="hidden p-3.5 rounded-xl mb-4 text-xs font-semibold flex items-center space-x-2"></div>
+
+            <form id="order-form" class="space-y-4">
+                <!-- Tajuk Tempahan -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">Tajuk / Perkhidmatan</label>
+                    <input type="text" id="order-title" required placeholder="Contoh: Cetak Laporan Assignment (20 Muka Surat)" class="w-full glass-input rounded-xl py-2.5 px-4 text-sm">
+                </div>
+
+                <!-- Pilihan Warna & Kuantiti -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-300 font-semibold mb-1.5">Jenis Cetakan</label>
+                        <select id="print-type" class="w-full glass-input rounded-xl py-2.5 px-3 text-sm bg-slate-900 cursor-pointer">
+                            <option value="Hitam Putih">Hitam Putih (B&W)</option>
+                            <option value="Berwarna">Berwarna (Color)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-300 font-semibold mb-1.5">Bilangan Salinan (Copies)</label>
+                        <input type="number" id="order-quantity" min="1" value="1" required class="w-full glass-input rounded-xl py-2.5 px-4 text-sm">
+                    </div>
+                </div>
+
+                <!-- Muat Naik Dokumen -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">Muat Naik Dokumen (PDF, DOCX, PNG, JPG)</label>
+                    <div class="relative border-2 border-dashed border-white/20 rounded-2xl p-6 text-center hover:border-cyan-400/50 transition bg-slate-900/40">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-cyan-400 mb-2"></i>
+                        <p class="text-xs text-slate-300 font-medium mb-1">Klik atau seret fail ke sini</p>
+                        <p id="file-name-display" class="text-[11px] text-slate-500">Tiada fail dipilih</p>
+                        <input type="file" id="order-file" required accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Catatan Tambahan -->
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">Catatan Tambahan (Pilihan)</label>
+                    <textarea id="order-notes" rows="2" placeholder="Contoh: Stapler di penjuru atas kiri / Binding tepi." class="w-full glass-input rounded-xl py-2.5 px-4 text-sm resize-none"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="btn-submit-order" class="glow-btn w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-sm hover:opacity-90 transition mt-4 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Hantar Tempahan</span>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-slate-500 text-xs z-10">
+        &copy; 2026 Cetak Tinta. Hak Cipta Terpelihara.
+    </footer>
+
+    <!-- Firebase & Upload Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // URL Google Apps Script API Web App Anda
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyMpAkIF64l4qfPIXS2PJK_dIhDf6JJMiJvfE-bLHwpO0tdJBgL1FqrXntbBtbmiiS/exec";
+
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
+            authDomain: "cetaktinta-bb755.firebaseapp.com",
+            projectId: "cetaktinta-bb755",
+            storageBucket: "cetaktinta-bb755.firebasestorage.app",
+            messagingSenderId: "439592324038",
+            appId: "1:439592324038:web:4ab89ce9706447809240c7",
+            measurementId: "G-X9ZEL7PEJV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        // Semak status pengesahan pengguna
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // Tunjukkan nama fail yang dipilih pelanggan
+        const fileInput = document.getElementById('order-file');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileNameDisplay.textContent = "Fail dipilih: " + e.target.files[0].name;
+                fileNameDisplay.className = "text-[11px] text-cyan-400 font-bold tracking-wide";
+            }
+        });
+
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.classList.remove('hidden', 'bg-red-500/20', 'border-red-500/50', 'text-red-300', 'bg-green-500/20', 'border-green-500/50', 'text-green-300');
+            
+            if (type === 'error') {
+                alertBox.classList.add('bg-red-500/20', 'border', 'border-red-500/50', 'text-red-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${message}</span>`;
+            } else {
+                alertBox.classList.add('bg-green-500/20', 'border', 'border-green-500/50', 'text-green-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+            }
+        }
+
+        // Tukar fail ke format Base64
+        const fileToBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = (error) => reject(error);
+        });
+
+        // PROSES SUBMIT ORDER
+        document.getElementById('order-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const btnSubmit = document.getElementById('btn-submit-order');
+            const file = fileInput.files[0];
+
+            try {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memuat Naik Fail ke Drive...</span>`;
+
+                // 1. Convert fail ke Base64
+                const base64Data = await fileToBase64(file);
+
+                // 2. Upload fail ke Google Drive via Apps Script Web App
+                const uploadPayload = {
+                    fileName: `${Date.now()}_${file.name}`,
+                    mimeType: file.type,
+                    fileData: base64Data
+                };
+
+                const driveResponse = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify(uploadPayload)
+                });
+
+                const driveResult = await driveResponse.json();
+
+                if (driveResult.result !== "success") {
+                    throw new Error("Ralat muat naik fail.");
+                }
+
+                btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menyimpan Tempahan...</span>`;
+
+                // 3. Simpan maklumat order ke Firestore Collection 'orders'
+                await addDoc(collection(db, "orders"), {
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    title: document.getElementById('order-title').value.trim(),
+                    printType: document.getElementById('print-type').value,
+                    quantity: parseInt(document.getElementById('order-quantity').value),
+                    notes: document.getElementById('order-notes').value.trim(),
+                    fileUrl: driveResult.fileUrl,       // Link direct ke fail dalam Drive anda
+                    fileDriveId: driveResult.fileId,
+                    status: "Pending",                  // Status asal tempahan
+                    createdAt: serverTimestamp()
+                });
+
+                showAlert("Tempahan berjaya dihantar dan fail tersimpan di Google Drive!", "success");
+
+                setTimeout(() => {
+                    window.location.href = "dashboard.html";
+                }, 1500);
+
+            } catch (error) {
+                console.error("Ralat tempahan:", error);
+                showAlert("Gagal menghantar tempahan. Sila semak semula fail dan cuba lagi.", "error");
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Hantar Tempahan</span>`;
+            }
+        });
+    </script>
+</body>
+</html>
