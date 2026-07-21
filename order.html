@@ -11,6 +11,12 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- PDF.js untuk kira muka surat PDF & Preview -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; overflow-x: hidden; }
         .animated-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); position: relative; }
@@ -49,61 +55,178 @@
     </header>
 
     <!-- Main Order Form -->
-    <main class="w-full max-w-2xl mx-auto px-4 my-auto z-10">
+    <main class="w-full max-w-3xl mx-auto px-4 my-auto z-10">
         <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative">
-            <div class="mb-6">
+            <div class="mb-6 border-b border-white/10 pb-4">
                 <h1 class="text-2xl font-bold text-white flex items-center gap-2 mb-1">
                     <i class="fa-solid fa-file-circle-plus text-cyan-400"></i> Buat Tempahan Cetak
                 </h1>
-                <p class="text-xs text-slate-400">Isi maklumat tempahan dan muat naik dokumen anda di bawah.</p>
+                <p class="text-xs text-slate-400">Lengkapkan borang peribadi, muat naik dokumen dan pilih spesifikasi cetakan anda.</p>
             </div>
 
             <!-- Alert Notification Box -->
             <div id="alert-box" class="hidden p-3.5 rounded-xl mb-4 text-xs font-semibold flex items-center space-x-2"></div>
 
-            <form id="order-form" class="space-y-4">
-                <!-- Tajuk Tempahan -->
+            <form id="order-form" class="space-y-6">
+
+                <!-- BAHAGIAN 1: MAKLUMAT PENERIMA -->
                 <div>
-                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">Tajuk / Perkhidmatan</label>
-                    <input type="text" id="order-title" required placeholder="Contoh: Cetak Laporan Assignment (20 Muka Surat)" class="w-full glass-input rounded-xl py-2.5 px-4 text-sm">
+                    <h2 class="text-sm font-bold text-cyan-400 tracking-wider uppercase mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-user"></i> 1. Maklumat Penerima & Penghantaran
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Nama Penerima *</label>
+                            <input type="text" id="recipient-name" required placeholder="Contoh: Ahmad Albab" class="w-full glass-input rounded-xl py-2.5 px-4 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Nombor Phone *</label>
+                            <input type="tel" id="recipient-phone" required placeholder="Contoh: 0123456789" class="w-full glass-input rounded-xl py-2.5 px-4 text-sm">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Email *</label>
+                            <input type="email" id="recipient-email" required placeholder="nama@gmail.com" class="w-full glass-input rounded-xl py-2.5 px-4 text-sm">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Alamat Penghantaran (Jika Pilihan Delivery) / Catatan Lokasi</label>
+                            <textarea id="delivery-address" rows="2" placeholder="Masukkan alamat lengkap rumah/kolej kediaman anda..." class="w-full glass-input rounded-xl py-2.5 px-4 text-sm resize-none"></textarea>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Pilihan Warna & Kuantiti -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs text-slate-300 font-semibold mb-1.5">Jenis Cetakan</label>
-                        <select id="print-type" class="w-full glass-input rounded-xl py-2.5 px-3 text-sm bg-slate-900 cursor-pointer">
-                            <option value="Hitam Putih">Hitam Putih (B&W)</option>
-                            <option value="Berwarna">Berwarna (Color)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-300 font-semibold mb-1.5">Bilangan Salinan (Copies)</label>
-                        <input type="number" id="order-quantity" min="1" value="1" required class="w-full glass-input rounded-xl py-2.5 px-4 text-sm">
-                    </div>
-                </div>
+                <hr class="border-white/10">
 
-                <!-- Muat Naik Dokumen -->
+                <!-- BAHAGIAN 2: MUAT NAIK & PRATONTON DOKUMEN -->
                 <div>
-                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">Muat Naik Dokumen (PDF, DOCX, PNG, JPG)</label>
-                    <div class="relative border-2 border-dashed border-white/20 rounded-2xl p-6 text-center hover:border-cyan-400/50 transition bg-slate-900/40">
+                    <h2 class="text-sm font-bold text-cyan-400 tracking-wider uppercase mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-file-lines"></i> 2. Muat Naik & Semak Dokumen
+                    </h2>
+                    
+                    <div id="drop-zone" class="relative border-2 border-dashed border-white/20 rounded-2xl p-6 text-center hover:border-cyan-400/50 transition bg-slate-900/40">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-cyan-400 mb-2"></i>
-                        <p class="text-xs text-slate-300 font-medium mb-1">Klik atau seret fail ke sini</p>
-                        <p id="file-name-display" class="text-[11px] text-slate-500">Tiada fail dipilih</p>
-                        <input type="file" id="order-file" required accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        <p class="text-xs text-slate-300 font-medium mb-1">Klik atau seret fail ke sini (PDF, PNG, JPG)</p>
+                        <p class="text-[10px] text-slate-500">Maksimum saiz fail: 10MB</p>
+                        <input type="file" id="order-file" required accept=".pdf,.png,.jpg,.jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     </div>
+
+                    <!-- Kotak Pratonton Fail (Preview Container) -->
+                    <div id="file-preview-container" class="hidden mt-4 bg-slate-900/80 border border-cyan-500/30 rounded-2xl p-4">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+                            <div class="flex items-center gap-3">
+                                <i id="file-icon" class="fa-solid fa-file-pdf text-red-400 text-2xl"></i>
+                                <div>
+                                    <p id="preview-file-name" class="text-xs font-bold text-white truncate max-w-[200px] sm:max-w-[350px]">nama_fail.pdf</p>
+                                    <p id="preview-file-info" class="text-[11px] text-cyan-400 font-semibold">Memuatkan info...</p>
+                                </div>
+                            </div>
+                            <button type="button" id="btn-remove-file" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-3 py-1.5 rounded-lg border border-red-500/30 transition flex items-center gap-1">
+                                <i class="fa-solid fa-trash"></i> Padam Fail
+                            </button>
+                        </div>
+                        
+                        <!-- Tempat Papar Preview Dokumen -->
+                        <div class="w-full flex justify-center bg-slate-950 rounded-xl p-2 max-h-[300px] overflow-y-auto border border-white/5">
+                            <canvas id="pdf-preview-canvas" class="hidden rounded shadow-lg max-w-full h-auto"></canvas>
+                            <img id="img-preview" class="hidden rounded shadow-lg max-h-[280px] object-contain" alt="Pratonton Fail">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-white/10">
+
+                <!-- BAHAGIAN 3: PILIHAN CETAKAN & MOD PENERIMAAN -->
+                <div>
+                    <h2 class="text-sm font-bold text-cyan-400 tracking-wider uppercase mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> 3. Spesifikasi Cetakan & Mod Penerimaan
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Jenis Cetakan warna/hitam putih -->
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Pilihan Warna</label>
+                            <select id="print-color" class="w-full glass-input rounded-xl py-2.5 px-3 text-sm bg-slate-900 cursor-pointer">
+                                <option value="bw">Hitam Putih (RM 0.30 / Muka Surat)</option>
+                                <option value="color">Berwarna (RM 0.60 / Muka Surat)</option>
+                            </select>
+                        </div>
+
+                        <!-- Cetak Depan Belakang / 1 Bahagian -->
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Pilihan Muka Surat Cetakan</label>
+                            <select id="print-sides" class="w-full glass-input rounded-xl py-2.5 px-3 text-sm bg-slate-900 cursor-pointer">
+                                <option value="simplex">1 Bahagian Sahaja (Single-Sided)</option>
+                                <option value="duplex">Depan Belakang (Double-Sided)</option>
+                            </select>
+                        </div>
+
+                        <!-- Bilangan Copies -->
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Bilangan Salinan (Copies)</label>
+                            <input type="number" id="order-quantity" min="1" value="1" required class="w-full glass-input rounded-xl py-2.5 px-4 text-sm">
+                        </div>
+
+                        <!-- Mod Penerimaan -->
+                        <div>
+                            <label class="block text-xs text-slate-300 font-semibold mb-1">Mod Penerimaan</label>
+                            <select id="receive-mode" class="w-full glass-input rounded-xl py-2.5 px-3 text-sm bg-slate-900 cursor-pointer">
+                                <option value="pickup">Self Pickup (Percuma)</option>
+                                <option value="delivery">Delivery / Penghantaran (+RM 5.00)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAHAGIAN 4: RESIT HARGA & SEBUT HARGA AUTOMATIK -->
+                <div class="bg-gradient-to-br from-slate-900 via-purple-950/30 to-slate-900 p-5 rounded-2xl border border-cyan-500/30 shadow-inner">
+                    <h3 class="text-xs font-extrabold uppercase tracking-widest text-cyan-400 mb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-receipt"></i> Anggaran Resit & Sebut Harga</span>
+                        <span class="text-[10px] text-slate-400 font-normal">Dikira Secara Real-Time</span>
+                    </h3>
+                    
+                    <div class="space-y-2 text-xs text-slate-300">
+                        <div class="flex justify-between">
+                            <span>Jumlah Muka Surat (Pages):</span>
+                            <span id="resit-pages" class="font-bold text-white">1 Page</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Kadar Cetakan / Page:</span>
+                            <span id="resit-rate" class="font-bold text-white">RM 0.30</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Bilangan Salinan:</span>
+                            <span id="resit-copies" class="font-bold text-white">1 Copy</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Kos Penghantaran:</span>
+                            <span id="resit-delivery" class="font-bold text-white">RM 0.00</span>
+                        </div>
+                        <hr class="border-white/10 my-2">
+                        <div class="flex justify-between text-base font-extrabold text-cyan-400">
+                            <span>JUMLAH KESELURUHAN:</span>
+                            <span id="resit-total" class="text-xl text-cyan-300">RM 0.30</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOTIS PEMBAYARAN -->
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-xs text-amber-200/90 space-y-1">
+                    <p class="font-bold flex items-center gap-1.5 text-amber-400">
+                        <i class="fa-solid fa-wallet"></i> Kaedah Pembayaran:
+                    </p>
+                    <p>• Pembayaran boleh dilakukan secara <strong>Online Banking</strong> atau <strong>Cash / Tunai</strong> semasa penerimaan.</p>
+                    <p class="text-amber-300 font-semibold italic">⚠️ PERHATIAN: Jika memilih bayar secara Cash, wajib menyediakan wang tunai yang MENCUKUPI kerana kedai tidak menyediakan baki kembali!</p>
                 </div>
 
                 <!-- Catatan Tambahan -->
                 <div>
-                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">Catatan Tambahan (Pilihan)</label>
-                    <textarea id="order-notes" rows="2" placeholder="Contoh: Stapler di penjuru atas kiri / Binding tepi." class="w-full glass-input rounded-xl py-2.5 px-4 text-sm resize-none"></textarea>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1">Catatan Tambahan Kepada Kedai (Pilihan)</label>
+                    <textarea id="order-notes" rows="2" placeholder="Contoh: Stapler tepi, binding, atau pesanan khas..." class="w-full glass-input rounded-xl py-2.5 px-4 text-sm resize-none"></textarea>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" id="btn-submit-order" class="glow-btn w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-sm hover:opacity-90 transition mt-4 flex items-center justify-center space-x-2">
+                <button type="submit" id="btn-submit-order" class="glow-btn w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-sm hover:opacity-90 transition mt-4 flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-paper-plane"></i>
-                    <span>Hantar Tempahan</span>
+                    <span>Hantar Tempahan Cetak</span>
                 </button>
             </form>
         </div>
@@ -114,13 +237,13 @@
         &copy; 2026 Cetak Tinta. Hak Cipta Terpelihara.
     </footer>
 
-    <!-- Firebase & Upload Script -->
+    <!-- Firebase & Logik Kalkulator/Upload -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // URL Google Apps Script Terkini
+        // URL Google Apps Script Anda
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkzwL8vly8hRjrNrT-q2SsaMKULKuYoDmxSyfTTX6dNR4bOpwPKbS5RZC7m1M343yd/exec";
 
         // Konfigurasi Firebase
@@ -139,25 +262,148 @@
         const db = getFirestore(app);
 
         let currentUser = null;
+        let detectedPageCount = 1; // Default 1 page
 
-        // Semak status log masuk Firebase
+        // Auto Fill User Email bila Log In
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
+                document.getElementById('recipient-email').value = user.email || '';
             } else {
                 window.location.href = "login.html";
             }
         });
 
-        // Papar nama fail dipilih
+        // -------------------------------------------------------------
+        // LOGIK MEMBACA FAIL & PRATONTON (PREVIEW & PAGE COUNT)
+        // -------------------------------------------------------------
         const fileInput = document.getElementById('order-file');
-        const fileNameDisplay = document.getElementById('file-name-display');
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                fileNameDisplay.textContent = "Fail dipilih: " + e.target.files[0].name;
-                fileNameDisplay.className = "text-[11px] text-cyan-400 font-bold tracking-wide";
+        const dropZone = document.getElementById('drop-zone');
+        const previewContainer = document.getElementById('file-preview-container');
+        const previewFileName = document.getElementById('preview-file-name');
+        const previewFileInfo = document.getElementById('preview-file-info');
+        const btnRemoveFile = document.getElementById('btn-remove-file');
+        const pdfCanvas = document.getElementById('pdf-preview-canvas');
+        const imgPreview = document.getElementById('img-preview');
+        const fileIcon = document.getElementById('file-icon');
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        async function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            dropZone.classList.add('hidden');
+            previewContainer.classList.remove('hidden');
+            previewFileName.textContent = file.name;
+
+            // Reset view
+            pdfCanvas.classList.add('hidden');
+            imgPreview.classList.add('hidden');
+
+            if (file.type === "application/pdf") {
+                fileIcon.className = "fa-solid fa-file-pdf text-red-500 text-2xl";
+                previewFileInfo.textContent = "Mengira muka surat PDF...";
+                
+                // Baca PDF menggunakan PDF.js
+                const fileReader = new FileReader();
+                fileReader.onload = async function() {
+                    const typedarray = new Uint8Array(this.result);
+                    try {
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        detectedPageCount = pdf.numPages;
+                        previewFileInfo.textContent = `Dokumen PDF • ${detectedPageCount} Muka Surat`;
+
+                        // Render Halaman Pertama ke Canvas untuk Preview
+                        const page = await pdf.getPage(1);
+                        const viewport = page.getViewport({ scale: 0.8 });
+                        const context = pdfCanvas.getContext('2d');
+                        pdfCanvas.height = viewport.height;
+                        pdfCanvas.width = viewport.width;
+
+                        await page.render({ canvasContext: context, viewport: viewport }).promise;
+                        pdfCanvas.classList.remove('hidden');
+                        calculateTotal();
+                    } catch (err) {
+                        console.error("Ralat PDF:", err);
+                        previewFileInfo.textContent = "Gagal membaca PDF (Fail mungkin diprotect)";
+                    }
+                };
+                fileReader.readAsArrayBuffer(file);
+
+            } else if (file.type.startsWith("image/")) {
+                fileIcon.className = "fa-solid fa-file-image text-cyan-400 text-2xl";
+                detectedPageCount = 1; // Gambar dikira 1 page
+                previewFileInfo.textContent = "Dokumen Imej • 1 Muka Surat";
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imgPreview.src = e.target.result;
+                    imgPreview.classList.remove('hidden');
+                    calculateTotal();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                detectedPageCount = 1;
+                previewFileInfo.textContent = "Dokumen • 1 Muka Surat";
+                calculateTotal();
             }
+        }
+
+        // Butang Padam Fail
+        btnRemoveFile.addEventListener('click', () => {
+            fileInput.value = "";
+            detectedPageCount = 1;
+            previewContainer.classList.add('hidden');
+            dropZone.classList.remove('hidden');
+            calculateTotal();
         });
+
+        // -------------------------------------------------------------
+        // LOGIK KALKULATOR HARGA
+        // -------------------------------------------------------------
+        const printColorSelect = document.getElementById('print-color');
+        const printSidesSelect = document.getElementById('print-sides');
+        const quantityInput = document.getElementById('order-quantity');
+        const receiveModeSelect = document.getElementById('receive-mode');
+
+        // Event listeners untuk calculate balik bila bertukar pilihan
+        [printColorSelect, printSidesSelect, quantityInput, receiveModeSelect].forEach(el => {
+            el.addEventListener('change', calculateTotal);
+            el.addEventListener('input', calculateTotal);
+        });
+
+        function calculateTotal() {
+            const colorType = printColorSelect.value; // 'bw' atau 'color'
+            const copies = parseInt(quantityInput.value) || 1;
+            const receiveMode = receiveModeSelect.value; // 'pickup' atau 'delivery'
+
+            // Harga per page: Hitam Putih = RM0.30, Warna = RM0.60
+            const ratePerPage = (colorType === 'color') ? 0.60 : 0.30;
+            
+            // Delivery Charge
+            const deliveryCharge = (receiveMode === 'delivery') ? 5.00 : 0.00;
+
+            // Pengiraan Keseluruhan
+            const totalPrintCost = (detectedPageCount * ratePerPage) * copies;
+            const finalTotal = totalPrintCost + deliveryCharge;
+
+            // Kemaskini Paparan Resit
+            document.getElementById('resit-pages').textContent = `${detectedPageCount} Page${detectedPageCount > 1 ? 's' : ''}`;
+            document.getElementById('resit-rate').textContent = `RM ${ratePerPage.toFixed(2)}`;
+            document.getElementById('resit-copies').textContent = `${copies} Cop${copies > 1 ? 'ies' : 'y'}`;
+            document.getElementById('resit-delivery').textContent = `RM ${deliveryCharge.toFixed(2)}`;
+            document.getElementById('resit-total').textContent = `RM ${finalTotal.toFixed(2)}`;
+
+            return {
+                ratePerPage,
+                copies,
+                deliveryCharge,
+                totalPrintCost,
+                finalTotal,
+                pages: detectedPageCount
+            };
+        }
 
         function showAlert(message, type = 'error') {
             const alertBox = document.getElementById('alert-box');
@@ -172,7 +418,6 @@
             }
         }
 
-        // Tukar fail kepada Base64
         const fileToBase64 = (file) => new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -180,7 +425,9 @@
             reader.onerror = (error) => reject(error);
         });
 
+        // -------------------------------------------------------------
         // HANTAR TEMPAHAN
+        // -------------------------------------------------------------
         document.getElementById('order-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
@@ -188,11 +435,17 @@
             const btnSubmit = document.getElementById('btn-submit-order');
             const file = fileInput.files[0];
 
-            // Saiz fail bawah 10MB
+            if (!file) {
+                showAlert("Sila pilih fail dokumen untuk dimuat naik!", "error");
+                return;
+            }
+
             if (file.size > 10 * 1024 * 1024) {
                 showAlert("Saiz fail terlalu besar! Sila muat naik fail bawah 10MB.", "error");
                 return;
             }
+
+            const calc = calculateTotal();
 
             try {
                 btnSubmit.disabled = true;
@@ -201,19 +454,17 @@
                 // 1. Convert fail ke Base64
                 const base64Data = await fileToBase64(file);
 
-                // 2. Data payload
+                // 2. Payload Drive
                 const uploadPayload = {
                     fileName: `${Date.now()}_${file.name}`,
                     mimeType: file.type || "application/octet-stream",
                     fileData: base64Data
                 };
 
-                // 3. Hantar ke Apps Script (pintas isu CORS dengan text/plain)
+                // 3. Post ke Google Apps Script
                 const driveResponse = await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "text/plain;charset=utf-8"
-                    },
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify(uploadPayload)
                 });
 
@@ -225,21 +476,31 @@
 
                 btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menyimpan Tempahan...</span>`;
 
-                // 4. Simpan ke Firestore
+                // 4. Simpan ke Firestore Database
                 await addDoc(collection(db, "orders"), {
                     userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    title: document.getElementById('order-title').value.trim(),
-                    printType: document.getElementById('print-type').value,
-                    quantity: parseInt(document.getElementById('order-quantity').value),
-                    notes: document.getElementById('order-notes').value.trim(),
+                    recipientName: document.getElementById('recipient-name').value.trim(),
+                    recipientPhone: document.getElementById('recipient-phone').value.trim(),
+                    recipientEmail: document.getElementById('recipient-email').value.trim(),
+                    deliveryAddress: document.getElementById('delivery-address').value.trim(),
+                    
+                    fileName: file.name,
                     fileUrl: driveResult.fileUrl,
                     fileDriveId: driveResult.fileId,
+                    
+                    printColor: printColorSelect.value === 'color' ? 'Berwarna' : 'Hitam Putih',
+                    printSides: printSidesSelect.value === 'duplex' ? 'Depan Belakang' : '1 Bahagian Sahaja',
+                    quantity: calc.copies,
+                    pageCount: calc.pages,
+                    receiveMode: receiveModeSelect.value === 'delivery' ? 'Delivery' : 'Self Pickup',
+                    
+                    totalPrice: calc.finalTotal,
+                    notes: document.getElementById('order-notes').value.trim(),
                     status: "Pending",
                     createdAt: serverTimestamp()
                 });
 
-                showAlert("Tempahan berjaya dihantar dan tersimpan di Google Drive!", "success");
+                showAlert("Tempahan berjaya dihantar! Terima kasih.", "success");
 
                 setTimeout(() => {
                     window.location.href = "dashboard.html";
@@ -250,7 +511,7 @@
                 showAlert("Gagal menghantar tempahan: " + error.message, "error");
             } finally {
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Hantar Tempahan</span>`;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Hantar Tempahan Cetak</span>`;
             }
         });
     </script>
