@@ -228,7 +228,8 @@
         import { 
             getAuth, 
             createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword 
+            signInWithEmailAndPassword,
+            onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { 
             getFirestore, 
@@ -253,6 +254,14 @@
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // Semak jika pengguna sudahpun log masuk, terus redirect ke dashboard.html
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Pengguna sudah log masuk
+                window.location.href = "dashboard.html";
+            }
+        });
 
         // Utility: Alert Box Function
         function showAlert(message, type = 'error') {
@@ -320,11 +329,11 @@
                     createdAt: serverTimestamp()
                 });
 
-                showAlert("Pendaftaran berjaya! Mengalihkan...", "success");
+                showAlert("Pendaftaran berjaya! Mengalihkan ke Dashboard...", "success");
                 
                 setTimeout(() => {
-                    window.location.href = "dashboard.html"; // Mengarah ke halaman tempahan
-                }, 1500);
+                    window.location.href = "dashboard.html"; // Redirect ke Dashboard
+                }, 1200);
 
             } catch (error) {
                 console.error(error);
@@ -355,11 +364,11 @@
                 // Log masuk guna Firebase Auth
                 await signInWithEmailAndPassword(auth, email, password);
                 
-                showAlert("Log masuk berjaya! Mengalihkan...", "success");
+                showAlert("Log masuk berjaya! Mengalihkan ke Dashboard...", "success");
 
                 setTimeout(() => {
-                    window.location.href = "dashboard.html"; // Mengarah ke halaman tempahan
-                }, 1500);
+                    window.location.href = "dashboard.html"; // Redirect ke Dashboard
+                }, 1200);
 
             } catch (error) {
                 console.error(error);
