@@ -91,13 +91,12 @@
         &copy; 2026 Cetak Tinta Admin System. Hak Cipta Terpelihara.
     </footer>
 
-    <!-- Firebase SDK & Logik Pemaparan Data -->
+    <!-- Firebase SDK & Logik Baca Terus Koleksi -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Konfigurasi Firebase Projek Anda
         const firebaseConfig = {
             apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
             authDomain: "cetaktinta-bb755.firebaseapp.com",
@@ -116,12 +115,11 @@
         const emptyState = document.getElementById('empty-state');
         const pendingCountEl = document.getElementById('pending-count');
 
-        // Semak status pengesahan admin
         onAuthStateChanged(auth, (user) => {
             if (!user) {
                 window.location.href = "login.html";
             } else {
-                loadPendingOrders();
+                loadAllOrdersDirectly();
             }
         });
 
@@ -139,32 +137,33 @@
             setTimeout(() => alertBox.classList.add('hidden'), 4000);
         }
 
-        // Fungsi Memuatkan Data Order dari Firestore secara Real-Time
-        function loadPendingOrders() {
+        // Baca terus semua dokumen dari koleksi 'orders' tanpa syarat kompleks (mengelakkan isu ralat Index Firestore)
+        function loadAllOrdersDirectly() {
             try {
-                // Query mengambil data koleksi 'orders' di mana status == 'Pending'
-                const q = query(
-                    collection(db, "orders"), 
-                    where("status", "==", "Pending"), 
-                    orderBy("createdAt", "desc")
-                );
-
-                onSnapshot(q, (snapshot) => {
+                onSnapshot(collection(db, "orders"), (snapshot) => {
                     ordersGrid.innerHTML = "";
-                    pendingCountEl.textContent = snapshot.size;
+                    let pendingList = [];
 
-                    if (snapshot.empty) {
+                    // Tapis data secara manual di JavaScript (Hanya ambil yang status == "Pending" atau tiada status)
+                    snapshot.forEach((docSnap) => {
+                        const order = docSnap.data();
+                        const status = order.status ? order.status.trim() : "Pending"; // Defaultkan kepada Pending jika field status tiada
+
+                        if (status === "Pending") {
+                            pendingList.push({ id: docSnap.id, ...order });
+                        }
+                    });
+
+                    pendingCountEl.textContent = pendingList.length;
+
+                    if (pendingList.length === 0) {
                         emptyState.classList.remove('hidden');
                         return;
                     }
 
                     emptyState.classList.add('hidden');
 
-                    snapshot.forEach((docSnap) => {
-                        const order = docSnap.data();
-                        const orderId = docSnap.id;
-                        
-                        // Format masa
+                    pendingList.forEach((order) => {
                         let dateFormatted = 'Baru sahaja';
                         if (order.createdAt && order.createdAt.seconds) {
                             dateFormatted = new Date(order.createdAt.seconds * 1000).toLocaleString('ms-MY', { 
@@ -222,7 +221,7 @@
                                     <i class="fa-solid fa-external-link-alt text-[10px] ml-auto"></i>
                                 </a>
 
-                                <button onclick="processOrder('${orderId}', '${order.recipientName || 'Pelanggan'}')" class="glow-btn w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-xs hover:opacity-90 transition flex items-center justify-center gap-2">
+                                <button onclick="processOrder('${order.id}', '${order.recipientName || 'Pelanggan'}')" class="glow-btn w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-xs hover:opacity-90 transition flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-spinner"></i>
                                     <span>Proses Order Ini</span>
                                 </button>
@@ -231,15 +230,11 @@
                         ordersGrid.appendChild(card);
                     });
                 }, (error) => {
-                    console.error("Ralat Stream Firestore:", error);
-                    // Jika ralat index Firestore berlaku, paparkan mesej panduan di konsol
-                    if (error.code === 'failed-precondition') {
-                        console.warn("Sila buat Firestore Composite Index di Firebase Console untuk gabungan query 'status' dan 'createdAt'.");
-                    }
+                    console.error("Ralat Sambungan Firestore:", error);
                 });
 
             } catch (err) {
-                console.error("Ralat memuatkan pesanan:", err);
+                console.error("Ralat membaca data:", err);
             }
         }
 
