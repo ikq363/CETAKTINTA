@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Saya | Cetak Tinta</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        .animated-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            position: relative;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: float 8s infinite alternate ease-in-out;
+            pointer-events: none;
+        }
+
+        .blob-1 {
+            top: 5%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: #06b6d4;
+        }
+
+        .blob-2 {
+            bottom: 10%;
+            right: 10%;
+            width: 320px;
+            height: 320px;
+            background: #a855f7;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(25px, 35px) scale(1.08); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-input {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .glass-input:focus {
+            outline: none;
+            border-color: #06b6d4;
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.35);
+        }
+
+        .glass-input:disabled {
+            background: rgba(15, 23, 42, 0.3);
+            border-color: rgba(255, 255, 255, 0.05);
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .glow-btn {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            transition: all 0.3s ease;
+        }
+        .glow-btn:hover {
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
+        }
+    </style>
+</head>
+<body class="animated-bg flex flex-col justify-between relative min-h-screen">
+
+    <!-- Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Header Navigation -->
+    <header class="w-full max-w-7xl mx-auto px-6 py-4 flex justify-between items-center z-10 border-b border-white/5">
+        <a href="dashboard.html" class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-purple-500 to-yellow-400 p-0.5 flex items-center justify-center shadow-lg">
+                <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                    <i class="fa-solid fa-print text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-xl"></i>
+                </div>
+            </div>
+            <span class="text-xl sm:text-2xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400">
+                CETAK TINTA
+            </span>
+        </a>
+
+        <div class="flex items-center space-x-3">
+            <a href="dashboard.html" class="px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition flex items-center space-x-2 border border-white/10">
+                <i class="fa-solid fa-gauge-high text-cyan-400"></i>
+                <span class="hidden sm:inline">Dashboard</span>
+            </a>
+            <button id="btn-logout" class="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-xs font-semibold text-red-400 border border-red-500/20 transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span class="hidden sm:inline">Log Keluar</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-4xl mx-auto px-4 py-8 z-10 my-auto">
+        
+        <!-- Breadcrumb & Title -->
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <a href="dashboard.html" class="text-xs text-cyan-400 hover:underline flex items-center gap-1 mb-1">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
+                </a>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-wide flex items-center gap-3">
+                    <i class="fa-solid fa-user-gear text-cyan-400"></i> Tetapan Profil
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-400 mt-1">Kemaskini maklumat peribadi dan tetapan akaun anda di sini.</p>
+            </div>
+            <div id="user-badge-status" class="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold self-start sm:self-auto">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Akaun Aktif</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Sidebar / Avatar Card -->
+            <div class="lg:col-span-1">
+                <div class="glass-card rounded-3xl p-6 text-center relative overflow-hidden flex flex-col items-center">
+                    <div class="relative mb-4">
+                        <div class="w-28 h-28 rounded-full bg-gradient-to-tr from-cyan-500 to-purple-600 p-1 flex items-center justify-center shadow-xl">
+                            <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center overflow-hidden">
+                                <i class="fa-solid fa-user text-5xl text-slate-400" id="avatar-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 id="display-profile-name" class="text-lg font-bold text-white mb-1">Memuatkan...</h2>
+                    <p id="display-profile-email" class="text-xs text-slate-400 mb-4 break-all">...</p>
+
+                    <div class="w-full pt-4 border-t border-white/10 space-y-2 text-left text-xs text-slate-300">
+                        <div class="flex items-center justify-between py-1">
+                            <span class="text-slate-400"><i class="fa-solid fa-id-badge text-cyan-400 mr-2"></i> ID Pengguna</span>
+                            <span id="display-uid" class="font-mono text-[10px] bg-slate-800 px-2 py-0.5 rounded text-cyan-300">...</span>
+                        </div>
+                        <div class="flex items-center justify-between py-1">
+                            <span class="text-slate-400"><i class="fa-solid fa-calendar-check text-purple-400 mr-2"></i> Ahli Sejak</span>
+                            <span id="display-created-at" class="font-medium text-slate-200">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Form Card -->
+            <div class="lg:col-span-2">
+                <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+                    
+                    <!-- Alert Notification Box -->
+                    <div id="alert-box" class="hidden p-4 rounded-2xl mb-6 text-xs font-semibold flex items-center space-x-3 transition-all"></div>
+
+                    <form id="profile-form" class="space-y-5">
+                        
+                        <!-- Nama Penuh -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2 flex items-center justify-between">
+                                <span><i class="fa-solid fa-user text-cyan-400 mr-1.5"></i> Nama Penuh</span>
+                                <span class="text-[10px] text-slate-500">Wajib</span>
+                            </label>
+                            <div class="relative">
+                                <input type="text" id="input-name" required placeholder="Ahmad Ali" class="w-full glass-input rounded-xl py-3 px-4 text-sm font-medium">
+                            </div>
+                        </div>
+
+                        <!-- Nombor Telefon -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2 flex items-center justify-between">
+                                <span><i class="fa-solid fa-phone text-cyan-400 mr-1.5"></i> Nombor Telefon</span>
+                                <span class="text-[10px] text-slate-500">Wajib</span>
+                            </label>
+                            <div class="relative">
+                                <input type="tel" id="input-phone" required placeholder="0123456789" class="w-full glass-input rounded-xl py-3 px-4 text-sm font-medium">
+                            </div>
+                        </div>
+
+                        <!-- E-mel (Read Only / Locked) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2 flex items-center justify-between">
+                                <span><i class="fa-solid fa-envelope text-slate-400 mr-1.5"></i> Alamat E-mel</span>
+                                <span class="text-[10px] text-slate-500"><i class="fa-solid fa-lock"></i> Tidak boleh diubah</span>
+                            </label>
+                            <div class="relative">
+                                <input type="email" id="input-email" disabled class="w-full glass-input rounded-xl py-3 px-4 text-sm font-medium">
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-1">E-mel digunakan sebagai ID rasmi log masuk anda.</p>
+                        </div>
+
+                        <!-- Alamat Pengambilan / Penghantaran Default -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2">
+                                <i class="fa-solid fa-location-dot text-cyan-400 mr-1.5"></i> Alamat / Lokasi Pengambilan Kolej (Pilihan)
+                            </label>
+                            <textarea id="input-address" rows="3" placeholder="Contoh: Kolej Melati, Blok B, Bilik 204" class="w-full glass-input rounded-xl py-3 px-4 text-sm font-medium resize-none"></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="pt-2 flex items-center justify-end space-x-3">
+                            <a href="dashboard.html" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition">
+                                Batal
+                            </a>
+                            <button type="submit" id="btn-save-profile" class="glow-btn px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-xs sm:text-sm hover:opacity-90 transition flex items-center space-x-2">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Simpan Perubahan</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-slate-500 text-xs z-10 border-t border-white/5 mt-auto">
+        &copy; 2026 Cetak Tinta. Hak Cipta Terpelihara.
+    </footer>
+
+    <!-- Firebase Script (Modular SDK v10+) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
+            authDomain: "cetaktinta-bb755.firebaseapp.com",
+            projectId: "cetaktinta-bb755",
+            storageBucket: "cetaktinta-bb755.firebasestorage.app",
+            messagingSenderId: "439592324038",
+            appId: "1:439592324038:web:4ab89ce9706447809240c7",
+            measurementId: "G-X9ZEL7PEJV"
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        // Utility: Alert Box
+        function showAlert(message, type = 'success') {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.classList.remove('hidden', 'bg-red-500/20', 'border-red-500/50', 'text-red-300', 'bg-green-500/20', 'border-green-500/50', 'text-green-300');
+            
+            if (type === 'error') {
+                alertBox.classList.add('bg-red-500/20', 'border', 'border-red-500/50', 'text-red-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation text-base"></i> <span>${message}</span>`;
+            } else {
+                alertBox.classList.add('bg-green-500/20', 'border', 'border-green-500/50', 'text-green-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-check text-base"></i> <span>${message}</span>`;
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Semak Sesi Pengguna
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadUserProfile(user);
+            } else {
+                // Jika belum log masuk, tendang ke login.html
+                window.location.href = "login.html";
+            }
+        });
+
+        // Muat Data Profil dari Firestore
+        async function loadUserProfile(user) {
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+
+                // Set data asas dari Auth
+                document.getElementById('input-email').value = user.email || '';
+                document.getElementById('display-profile-email').textContent = user.email || '-';
+                document.getElementById('display-uid').textContent = user.uid.substring(0, 8) + '...';
+
+                if (userDocSnap.exists()) {
+                    const data = userDocSnap.data();
+                    
+                    document.getElementById('input-name').value = data.fullName || '';
+                    document.getElementById('input-phone').value = data.phone || '';
+                    document.getElementById('input-address').value = data.address || '';
+                    
+                    document.getElementById('display-profile-name').textContent = data.fullName || 'Pengguna Cetak Tinta';
+
+                    // Tarikh daftar
+                    if (data.createdAt) {
+                        const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date();
+                        document.getElementById('display-created-at').textContent = date.toLocaleDateString('ms-MY', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                    } else {
+                        document.getElementById('display-created-at').textContent = 'Baru';
+                    }
+                } else {
+                    document.getElementById('display-profile-name').textContent = 'Pengguna Baru';
+                    document.getElementById('display-created-at').textContent = 'Baru';
+                }
+            } catch (error) {
+                console.error("Ralat memuatkan profil:", error);
+                showAlert("Gagal memuatkan data profil.", "error");
+            }
+        }
+
+        // Simpan Kemaskini Profil
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const name = document.getElementById('input-name').value.trim();
+            const phone = document.getElementById('input-phone').value.trim();
+            const address = document.getElementById('input-address').value.trim();
+            const btnSave = document.getElementById('btn-save-profile');
+
+            try {
+                btnSave.disabled = true;
+                btnSave.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menyimpan...</span>`;
+
+                const userDocRef = doc(db, "users", currentUser.uid);
+
+                // Gunakan setDoc dengan merge: true supaya tidak memadamkan data sedia ada
+                await setDoc(userDocRef, {
+                    fullName: name,
+                    phone: phone,
+                    address: address,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                // Kemaskini paparan terus di UI
+                document.getElementById('display-profile-name').textContent = name;
+
+                showAlert("Profil anda berjaya dikemaskini!", "success");
+
+            } catch (error) {
+                console.error("Ralat menyimpan profil:", error);
+                showAlert("Gagal menyimpan kemaskini. Sila cuba lagi.", "error");
+            } finally {
+                btnSave.disabled = false;
+                btnSave.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Simpan Perubahan</span>`;
+            }
+        });
+
+        // Log Keluar Function
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            if (confirm("Adakah anda pasti untuk log keluar?")) {
+                try {
+                    await signOut(auth);
+                    window.location.href = "login.html";
+                } catch (err) {
+                    console.error("Gagal log keluar:", err);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
