@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dalam Proses | Admin Cetak Tinta</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; overflow-x: hidden; }
+        .animated-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); position: relative; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glow-btn-purple { box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); transition: all 0.3s ease; }
+        .glow-btn-purple:hover { box-shadow: 0 0 25px rgba(168, 85, 247, 0.7); }
+        
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; pointer-events: none; }
+        .blob-1 { top: 5%; left: 5%; width: 250px; height: 250px; background: #a855f7; }
+        .blob-2 { bottom: 5%; right: 5%; width: 280px; height: 280px; background: #06b6d4; }
+    </style>
+</head>
+<body class="animated-bg min-h-screen flex flex-col justify-between py-6 relative">
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Header Navigation Admin -->
+    <header class="w-full max-w-7xl mx-auto px-6 flex justify-between items-center mb-8 z-10">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-500 via-cyan-500 to-yellow-400 p-0.5 flex items-center justify-center shadow-lg">
+                <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                    <i class="fa-solid fa-spinner text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 text-lg"></i>
+                </div>
+            </div>
+            <div>
+                <span class="text-xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-purple-400">
+                    PANEL ADMIN
+                </span>
+                <p class="text-[10px] text-purple-400 font-semibold tracking-widest uppercase">Pesanan Dalam Proses</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            <a href="admin-pesanan-masuk.html" class="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-white/10 transition flex items-center gap-2">
+                <i class="fa-solid fa-boxes-packing"></i> <span class="hidden sm:inline">Pesanan Masuk</span>
+            </a>
+            <a href="dashboard.html" class="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-white/10 transition flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Dashboard</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-7xl mx-auto px-4 my-auto z-10 flex-grow">
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-gears text-purple-400"></i> Senarai Sedang Diproses
+                </h1>
+                <p class="text-xs text-slate-400">Pesanan yang sedang disiap cetak atau menunggu masa untuk dihantar kepada pelanggan.</p>
+            </div>
+            <div class="bg-purple-500/10 border border-purple-500/30 px-4 py-2 rounded-xl text-xs text-purple-300 font-bold flex items-center gap-2 w-fit">
+                <i class="fa-solid fa-spinner animate-spin"></i>
+                <span>Jumlah Dalam Proses: <span id="process-count">0</span></span>
+            </div>
+        </div>
+
+        <!-- Alert Notification Box -->
+        <div id="alert-box" class="hidden p-3.5 rounded-xl mb-4 text-xs font-semibold flex items-center space-x-2"></div>
+
+        <!-- GALLERY VIEW (GRID CONTAINER) -->
+        <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Kad pesanan dalam proses akan dimasukkan secara dinamik -->
+        </div>
+
+        <!-- State Kosong -->
+        <div id="empty-state" class="hidden text-center py-20 glass-card rounded-3xl p-8 max-w-md mx-auto">
+            <div class="w-16 h-16 bg-slate-800 text-slate-500 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-white/5">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <h3 class="text-base font-bold text-white mb-1">Tiada Pesanan Dalam Proses</h3>
+            <p class="text-xs text-slate-400">Tiada tempahan yang sedang aktif diproses pada masa ini.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-6 text-center text-slate-500 text-xs z-10">
+        &copy; 2026 Cetak Tinta Admin System. Hak Cipta Terpelihara.
+    </footer>
+
+    <!-- Firebase SDK & Logik Pemaparan Data -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
+            authDomain: "cetaktinta-bb755.firebaseapp.com",
+            projectId: "cetaktinta-bb755",
+            storageBucket: "cetaktinta-bb755.firebasestorage.app",
+            messagingSenderId: "439592324038",
+            appId: "1:439592324038:web:4ab89ce9706447809240c7",
+            measurementId: "G-X9ZEL7PEJV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const ordersGrid = document.getElementById('orders-grid');
+        const emptyState = document.getElementById('empty-state');
+        const processCountEl = document.getElementById('process-count');
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            } else {
+                loadProcessOrders();
+            }
+        });
+
+        function showAlert(message, type = 'success') {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.classList.remove('hidden', 'bg-red-500/20', 'border-red-500/50', 'text-red-300', 'bg-green-500/20', 'border-green-500/50', 'text-green-300');
+            
+            if (type === 'error') {
+                alertBox.classList.add('bg-red-500/20', 'border', 'border-red-500/50', 'text-red-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${message}</span>`;
+            } else {
+                alertBox.classList.add('bg-green-500/20', 'border', 'border-green-500/50', 'text-green-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+            }
+            setTimeout(() => alertBox.classList.add('hidden'), 4000);
+        }
+
+        // Baca koleksi 'orders' dan tapis status "Proses"
+        function loadProcessOrders() {
+            try {
+                onSnapshot(collection(db, "orders"), (snapshot) => {
+                    ordersGrid.innerHTML = "";
+                    let processList = [];
+
+                    snapshot.forEach((docSnap) => {
+                        const order = docSnap.data();
+                        const status = order.status ? order.status.trim() : "";
+
+                        // Ambil hanya yang statusnya "Proses"
+                        if (status === "Proses") {
+                            processList.push({ id: docSnap.id, ...order });
+                        }
+                    });
+
+                    processCountEl.textContent = processList.length;
+
+                    if (processList.length === 0) {
+                        emptyState.classList.remove('hidden');
+                        return;
+                    }
+
+                    emptyState.classList.add('hidden');
+
+                    processList.forEach((order) => {
+                        let dateFormatted = 'Baru sahaja';
+                        if (order.createdAt && order.createdAt.seconds) {
+                            dateFormatted = new Date(order.createdAt.seconds * 1000).toLocaleString('ms-MY', { 
+                                dateStyle: 'medium', 
+                                timeStyle: 'short' 
+                            });
+                        }
+
+                        const card = document.createElement('div');
+                        card.className = "glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-purple-500/40 transition shadow-xl relative overflow-hidden group";
+                        
+                        card.innerHTML = `
+                            <div>
+                                <div class="flex justify-between items-start gap-2 mb-3">
+                                    <div>
+                                        <span class="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+                                            <i class="fa-solid fa-spinner animate-spin"></i> Dalam Proses
+                                        </span>
+                                        <p class="text-[11px] text-slate-400 mt-2"><i class="fa-regular fa-calendar-days"></i> ${dateFormatted}</p>
+                                    </div>
+                                    <span class="text-base font-extrabold text-purple-400">RM ${order.totalPrice ? Number(order.totalPrice).toFixed(2) : '0.00'}</span>
+                                </div>
+
+                                <!-- Maklumat Pelanggan -->
+                                <div class="bg-slate-900/50 p-3.5 rounded-2xl border border-white/5 space-y-2 mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xs font-bold text-white">${order.recipientName || 'Tanpa Nama'}</h3>
+                                            <p class="text-[11px] text-slate-400"><i class="fa-solid fa-phone text-[10px]"></i> ${order.recipientPhone || '-'}</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-[11px] text-slate-300 truncate"><i class="fa-solid fa-envelope text-slate-500 mr-1"></i> ${order.recipientEmail || '-'}</p>
+                                    <p class="text-[11px] text-slate-300"><i class="fa-solid fa-location-dot text-slate-500 mr-1"></i> <span class="font-semibold">${order.receiveMode || 'Pickup'}:</span> ${order.deliveryAddress || 'Self Pickup di kedai'}</p>
+                                </div>
+
+                                <!-- Spesifikasi Cetakan -->
+                                <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-300 mb-4 bg-white/5 p-3 rounded-xl">
+                                    <div><span class="text-slate-400">Warna:</span> <strong class="text-white">${order.printColor || '-'}</strong></div>
+                                    <div><span class="text-slate-400">Muka:</span> <strong class="text-white">${order.printSides || '-'}</strong></div>
+                                    <div><span class="text-slate-400">Muka Surat:</span> <strong class="text-white">${order.pageCount || 1} page</strong></div>
+                                    <div><span class="text-slate-400">Salinan:</span> <strong class="text-white">${order.quantity || 1} copy</strong></div>
+                                </div>
+
+                                ${order.notes ? `<p class="text-[11px] text-amber-200/90 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 mb-4"><strong>Nota:</strong> ${order.notes}</p>` : ''}
+                            </div>
+
+                            <!-- Bahagian Tindakan Bawah (Fail, Tukar ke Penghantaran, Padam) -->
+                            <div class="space-y-2.5 pt-3 border-t border-white/10">
+                                <a href="${order.fileUrl || '#'}" target="_blank" class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-cyan-300 border border-cyan-500/30 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-file-pdf text-red-400"></i>
+                                    <span class="truncate">Buka Dokumen (${order.fileName || 'Fail'})</span>
+                                </a>
+
+                                <div class="grid grid-cols-2 gap-2">
+                                    <!-- Butang Tukar ke Penghantaran / Selesai -->
+                                    <button onclick="updateToShipping('${order.id}', '${order.recipientName || 'Pelanggan'}')" class="glow-btn-purple py-2.5 px-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold text-[11px] hover:opacity-90 transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-truck-fast"></i>
+                                        <span>Penghantaran</span>
+                                    </button>
+
+                                    <!-- Butang Padam Order -->
+                                    <button onclick="deleteOrder('${order.id}', '${order.recipientName || 'Pelanggan'}')" class="py-2.5 px-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 font-bold text-[11px] transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                        <span>Padam</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        ordersGrid.appendChild(card);
+                    });
+                }, (error) => {
+                    console.error("Ralat Sambungan Firestore:", error);
+                });
+
+            } catch (err) {
+                console.error("Ralat membaca data:", err);
+            }
+        }
+
+        // Fungsi Global: Tukar Status ke "Penghantaran" atau "Selesai"
+        window.updateToShipping = async function(orderId, customerName) {
+            if (!confirm(`Tukar status pesanan ${customerName} kepada "Penghantaran / Selesai"?`)) {
+                return;
+            }
+
+            try {
+                const orderRef = doc(db, "orders", orderId);
+                await updateDoc(orderRef, {
+                    status: "Penghantaran", // atau "Selesai"
+                    shippedAt: serverTimestamp()
+                });
+                showAlert(`Pesanan ${customerName} telah dikemas kini ke status Penghantaran!`, "success");
+            } catch (error) {
+                console.error("Ralat kemaskini:", error);
+                showAlert("Gagal mengemas kini: " + error.message, "error");
+            }
+        }
+
+        // Fungsi Global: Padam (Delete) Order
+        window.deleteOrder = async function(orderId, customerName) {
+            if (!confirm(`AMARAN: Anda pasti mahu MEMADAM pesanan daripada ${customerName} secara kekal? Tindakan ini tidak boleh diundur.`)) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, "orders", orderId));
+                showAlert(`Pesanan ${customerName} telah berjaya dipadam.`, "success");
+            } catch (error) {
+                console.error("Ralat memadam:", error);
+                showAlert("Gagal memadam pesanan: " + error.message, "error");
+            }
+        }
+    </script>
+</body>
+</html>
