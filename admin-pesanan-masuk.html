@@ -73,7 +73,7 @@
 
         <!-- GALLERY VIEW (GRID CONTAINER) -->
         <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Kad pesanan akan dimasukkan secara dinamik melalui Javascript di sini -->
+            <!-- Kad pesanan akan dimasukkan secara dinamik melalui Javascript -->
         </div>
 
         <!-- State Kosong (Jika tiada order) -->
@@ -91,12 +91,13 @@
         &copy; 2026 Cetak Tinta Admin System. Hak Cipta Terpelihara.
     </footer>
 
-    <!-- Firebase Script -->
+    <!-- Firebase SDK & Logik Pemaparan Data -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, updateDate, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, orderBy, onSnapshot, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Konfigurasi Firebase Projek Anda
         const firebaseConfig = {
             apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
             authDomain: "cetaktinta-bb755.firebaseapp.com",
@@ -115,7 +116,7 @@
         const emptyState = document.getElementById('empty-state');
         const pendingCountEl = document.getElementById('pending-count');
 
-        // Pastikan hanya admin yang log masuk (Anda boleh tambah sekatan email admin di sini jika perlu)
+        // Semak status pengesahan admin
         onAuthStateChanged(auth, (user) => {
             if (!user) {
                 window.location.href = "login.html";
@@ -138,94 +139,111 @@
             setTimeout(() => alertBox.classList.add('hidden'), 4000);
         }
 
-        // Paparkan Data Pesanan Real-Time dari Firestore (Status = "Pending")
+        // Fungsi Memuatkan Data Order dari Firestore secara Real-Time
         function loadPendingOrders() {
-            const q = query(
-                collection(db, "orders"), 
-                where("status", "==", "Pending"), 
-                orderBy("createdAt", "desc")
-            );
+            try {
+                // Query mengambil data koleksi 'orders' di mana status == 'Pending'
+                const q = query(
+                    collection(db, "orders"), 
+                    where("status", "==", "Pending"), 
+                    orderBy("createdAt", "desc")
+                );
 
-            onSnapshot(q, (snapshot) => {
-                ordersGrid.innerHTML = "";
-                pendingCountEl.textContent = snapshot.size;
+                onSnapshot(q, (snapshot) => {
+                    ordersGrid.innerHTML = "";
+                    pendingCountEl.textContent = snapshot.size;
 
-                if (snapshot.empty) {
-                    emptyState.classList.remove('hidden');
-                    return;
-                }
+                    if (snapshot.empty) {
+                        emptyState.classList.remove('hidden');
+                        return;
+                    }
 
-                emptyState.classList.add('hidden');
+                    emptyState.classList.add('hidden');
 
-                snapshot.forEach((docSnap) => {
-                    const order = docSnap.data();
-                    const orderId = docSnap.id;
-                    const dateFormatted = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString('ms-MY', { dateStyle: 'medium', timeStyle: 'short' }) : 'Baru sahaja';
+                    snapshot.forEach((docSnap) => {
+                        const order = docSnap.data();
+                        const orderId = docSnap.id;
+                        
+                        // Format masa
+                        let dateFormatted = 'Baru sahaja';
+                        if (order.createdAt && order.createdAt.seconds) {
+                            dateFormatted = new Date(order.createdAt.seconds * 1000).toLocaleString('ms-MY', { 
+                                dateStyle: 'medium', 
+                                timeStyle: 'short' 
+                            });
+                        }
 
-                    const card = document.createElement('div');
-                    card.className = "glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-cyan-500/40 transition shadow-xl relative overflow-hidden group";
-                    
-                    card.innerHTML = `
-                        <!-- Header Kad -->
-                        <div>
-                            <div class="flex justify-between items-start gap-2 mb-3">
-                                <div>
-                                    <span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
-                                        <i class="fa-solid fa-clock"></i> Pending
-                                    </span>
-                                    <p class="text-[11px] text-slate-400 mt-2"><i class="fa-regular fa-calendar-days"></i> ${dateFormatted}</p>
-                                </div>
-                                <span class="text-base font-extrabold text-cyan-400">RM ${order.totalPrice ? order.totalPrice.toFixed(2) : '0.00'}</span>
-                            </div>
-
-                            <!-- Maklumat Pelanggan -->
-                            <div class="bg-slate-900/50 p-3.5 rounded-2xl border border-white/5 space-y-2 mb-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold">
-                                        <i class="fa-solid fa-user"></i>
-                                    </div>
+                        const card = document.createElement('div');
+                        card.className = "glass-card rounded-3xl p-5 flex flex-col justify-between border border-white/10 hover:border-cyan-500/40 transition shadow-xl relative overflow-hidden group";
+                        
+                        card.innerHTML = `
+                            <div>
+                                <div class="flex justify-between items-start gap-2 mb-3">
                                     <div>
-                                        <h3 class="text-xs font-bold text-white">${order.recipientName || 'Tanpa Nama'}</h3>
-                                        <p class="text-[11px] text-slate-400"><i class="fa-solid fa-phone text-[10px]"></i> ${order.recipientPhone || '-'}</p>
+                                        <span class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">
+                                            <i class="fa-solid fa-clock"></i> Pending
+                                        </span>
+                                        <p class="text-[11px] text-slate-400 mt-2"><i class="fa-regular fa-calendar-days"></i> ${dateFormatted}</p>
                                     </div>
+                                    <span class="text-base font-extrabold text-cyan-400">RM ${order.totalPrice ? Number(order.totalPrice).toFixed(2) : '0.00'}</span>
                                 </div>
-                                <p class="text-[11px] text-slate-300 truncate"><i class="fa-solid fa-envelope text-slate-500 mr-1"></i> ${order.recipientEmail || '-'}</p>
-                                <p class="text-[11px] text-slate-300"><i class="fa-solid fa-location-dot text-slate-500 mr-1"></i> <span class="font-semibold">${order.receiveMode}:</span> ${order.deliveryAddress || 'Self Pickup di kedai'}</p>
+
+                                <!-- Maklumat Pelanggan -->
+                                <div class="bg-slate-900/50 p-3.5 rounded-2xl border border-white/5 space-y-2 mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xs font-bold text-white">${order.recipientName || 'Tanpa Nama'}</h3>
+                                            <p class="text-[11px] text-slate-400"><i class="fa-solid fa-phone text-[10px]"></i> ${order.recipientPhone || '-'}</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-[11px] text-slate-300 truncate"><i class="fa-solid fa-envelope text-slate-500 mr-1"></i> ${order.recipientEmail || '-'}</p>
+                                    <p class="text-[11px] text-slate-300"><i class="fa-solid fa-location-dot text-slate-500 mr-1"></i> <span class="font-semibold">${order.receiveMode || 'Pickup'}:</span> ${order.deliveryAddress || 'Self Pickup di kedai'}</p>
+                                </div>
+
+                                <!-- Spesifikasi Cetakan -->
+                                <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-300 mb-4 bg-white/5 p-3 rounded-xl">
+                                    <div><span class="text-slate-400">Warna:</span> <strong class="text-white">${order.printColor || '-'}</strong></div>
+                                    <div><span class="text-slate-400">Muka:</span> <strong class="text-white">${order.printSides || '-'}</strong></div>
+                                    <div><span class="text-slate-400">Muka Surat:</span> <strong class="text-white">${order.pageCount || 1} page</strong></div>
+                                    <div><span class="text-slate-400">Salinan:</span> <strong class="text-white">${order.quantity || 1} copy</strong></div>
+                                </div>
+
+                                ${order.notes ? `<p class="text-[11px] text-amber-200/90 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 mb-4"><strong>Nota:</strong> ${order.notes}</p>` : ''}
                             </div>
 
-                            <!-- Spesifikasi Cetakan -->
-                            <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-300 mb-4 bg-white/5 p-3 rounded-xl">
-                                <div><span class="text-slate-400">Warna:</span> <strong class="text-white">${order.printColor}</strong></div>
-                                <div><span class="text-slate-400">Muka:</span> <strong class="text-white">${order.printSides}</strong></div>
-                                <div><span class="text-slate-400">Muka Surat:</span> <strong class="text-white">${order.pageCount} page</strong></div>
-                                <div><span class="text-slate-400">Salinan:</span> <strong class="text-white">${order.quantity} copy</strong></div>
+                            <!-- Bahagian Bawah: Fail & Butang Proses -->
+                            <div class="space-y-3 pt-3 border-t border-white/10">
+                                <a href="${order.fileUrl || '#'}" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-cyan-300 border border-cyan-500/30 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-file-pdf text-red-400"></i>
+                                    <span class="truncate">Buka Dokumen (${order.fileName || 'Fail'})</span>
+                                    <i class="fa-solid fa-external-link-alt text-[10px] ml-auto"></i>
+                                </a>
+
+                                <button onclick="processOrder('${orderId}', '${order.recipientName || 'Pelanggan'}')" class="glow-btn w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-xs hover:opacity-90 transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-spinner"></i>
+                                    <span>Proses Order Ini</span>
+                                </button>
                             </div>
-
-                            ${order.notes ? `<p class="text-[11px] text-amber-200/90 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 mb-4"><strong>Nota:</strong> ${order.notes}</p>` : ''}
-                        </div>
-
-                        <!-- Bahagian Bawah: Fail & Butang Proses -->
-                        <div class="space-y-3 pt-3 border-t border-white/10">
-                            <!-- Butang Buka Fail Dokumen -->
-                            <a href="${order.fileUrl}" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-cyan-300 border border-cyan-500/30 transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-file-pdf text-red-400"></i>
-                                <span class="truncate">Buka Dokumen (${order.fileName})</span>
-                                <i class="fa-solid fa-external-link-alt text-[10px] ml-auto"></i>
-                            </a>
-
-                            <!-- Butang Tindakan: Proses Order -->
-                            <button onclick="processOrder('${orderId}', '${order.recipientName}')" class="glow-btn w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-xs hover:opacity-90 transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-spinner"></i>
-                                <span>Proses Order Ini</span>
-                            </button>
-                        </div>
-                    `;
-                    ordersGrid.appendChild(card);
+                        `;
+                        ordersGrid.appendChild(card);
+                    });
+                }, (error) => {
+                    console.error("Ralat Stream Firestore:", error);
+                    // Jika ralat index Firestore berlaku, paparkan mesej panduan di konsol
+                    if (error.code === 'failed-precondition') {
+                        console.warn("Sila buat Firestore Composite Index di Firebase Console untuk gabungan query 'status' dan 'createdAt'.");
+                    }
                 });
-            });
+
+            } catch (err) {
+                console.error("Ralat memuatkan pesanan:", err);
+            }
         }
 
-        // Fungsi Tukar Status Order dari "Pending" kepada "Proses"
+        // Fungsi Global untuk Tukar Status Order ke "Proses"
         window.processOrder = async function(orderId, customerName) {
             if (!confirm(`Adakah anda pasti mahu memproses pesanan daripada ${customerName}? Pesanan ini akan dipindahkan ke bahagian "Dalam Proses".`)) {
                 return;
