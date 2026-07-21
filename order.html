@@ -379,7 +379,7 @@
         });
 
         // -------------------------------------------------------------
-        // LOGIK KALKULATOR HARGA
+        // LOGIK KALKULATOR HARGA (LENGKAP DENGAN DUPLEX / DOUBLE-SIDED)
         // -------------------------------------------------------------
         const printColorSelect = document.getElementById('print-color');
         const printSidesSelect = document.getElementById('print-sides');
@@ -393,23 +393,30 @@
 
         function calculateTotal() {
             const colorType = printColorSelect.value;
+            const printSides = printSidesSelect.value; // 'simplex' atau 'duplex'
             const copies = parseInt(quantityInput.value) || 1;
             const receiveMode = receiveModeSelect.value;
 
-            const ratePerPage = (colorType === 'color') ? 0.60 : 0.30;
+            // 1. Kadar asas 1 muka surat
+            const baseRate = (colorType === 'color') ? 0.60 : 0.30;
+            
+            // 2. Tentukan kadar mengikut pilihan muka surat (Duplex = 2x harga per helai)
+            const effectiveRate = (printSides === 'duplex') ? (baseRate * 2) : baseRate;
             const deliveryCharge = (receiveMode === 'delivery') ? 0.50 : 0.00;
 
-            const totalPrintCost = (detectedPageCount * ratePerPage) * copies;
+            // 3. Kira jumlah keseluruhan
+            const totalPrintCost = (detectedPageCount * effectiveRate) * copies;
             const finalTotal = totalPrintCost + deliveryCharge;
 
+            // 4. Kemaskini paparan resit secara real-time
             document.getElementById('resit-pages').textContent = `${detectedPageCount} Page${detectedPageCount > 1 ? 's' : ''}`;
-            document.getElementById('resit-rate').textContent = `RM ${ratePerPage.toFixed(2)}`;
+            document.getElementById('resit-rate').textContent = `RM ${effectiveRate.toFixed(2)} ${printSides === 'duplex' ? '(Depan Belakang)' : '(1 Bahagian)'}`;
             document.getElementById('resit-copies').textContent = `${copies} Cop${copies > 1 ? 'ies' : 'y'}`;
             document.getElementById('resit-delivery').textContent = `RM ${deliveryCharge.toFixed(2)}`;
             document.getElementById('resit-total').textContent = `RM ${finalTotal.toFixed(2)}`;
 
             return {
-                ratePerPage,
+                ratePerPage: effectiveRate,
                 copies,
                 deliveryCharge,
                 totalPrintCost,
