@@ -280,7 +280,7 @@
 
         let currentUser = null;
 
-        // Utility: Alert Box
+        // Fungsi Papar Mesej (Notification)
         function showAlert(message, type = 'success') {
             const alertBox = document.getElementById('alert-box');
             alertBox.classList.remove('hidden', 'bg-red-500/20', 'border-red-500/50', 'text-red-300', 'bg-green-500/20', 'border-green-500/50', 'text-green-300');
@@ -302,22 +302,23 @@
                 currentUser = user;
                 await loadUserProfile(user);
             } else {
-                // Jika belum log masuk, tendang ke login.html
+                // Jika belum log masuk, ke login.html
                 window.location.href = "login.html";
             }
         });
 
-        // Muat Data Profil dari Firestore
+        // 1. Dapatkan & Muat Data Profil dari Firestore
         async function loadUserProfile(user) {
             try {
                 const userDocRef = doc(db, "users", user.uid);
                 const userDocSnap = await getDoc(userDocRef);
 
-                // Set data asas dari Auth
+                // Set data asas dari Firebase Auth
                 document.getElementById('input-email').value = user.email || '';
                 document.getElementById('display-profile-email').textContent = user.email || '-';
                 document.getElementById('display-uid').textContent = user.uid.substring(0, 8) + '...';
 
+                // Jika dokumen wujud di Firestore
                 if (userDocSnap.exists()) {
                     const data = userDocSnap.data();
                     
@@ -327,7 +328,7 @@
                     
                     document.getElementById('display-profile-name').textContent = data.fullName || 'Pengguna Cetak Tinta';
 
-                    // Tarikh daftar
+                    // Tarikh pendaftaran akaun
                     if (data.createdAt) {
                         const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date();
                         document.getElementById('display-created-at').textContent = date.toLocaleDateString('ms-MY', {
@@ -348,7 +349,7 @@
             }
         }
 
-        // Simpan Kemaskini Profil
+        // 2. Simpan & Naikkan Data Terkemaskini ke Firestore
         document.getElementById('profile-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!currentUser) return;
@@ -359,12 +360,13 @@
             const btnSave = document.getElementById('btn-save-profile');
 
             try {
+                // Kemaskini butang ke status 'Loading'
                 btnSave.disabled = true;
                 btnSave.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menyimpan...</span>`;
 
                 const userDocRef = doc(db, "users", currentUser.uid);
 
-                // Gunakan setDoc dengan merge: true supaya tidak memadamkan data sedia ada
+                // Kemaskini data ke koleksi 'users' dengan { merge: true }
                 await setDoc(userDocRef, {
                     fullName: name,
                     phone: phone,
@@ -372,7 +374,7 @@
                     updatedAt: serverTimestamp()
                 }, { merge: true });
 
-                // Kemaskini paparan terus di UI
+                // Kemaskini paparan nama secara langsung di UI
                 document.getElementById('display-profile-name').textContent = name;
 
                 showAlert("Profil anda berjaya dikemaskini!", "success");
@@ -381,12 +383,13 @@
                 console.error("Ralat menyimpan profil:", error);
                 showAlert("Gagal menyimpan kemaskini. Sila cuba lagi.", "error");
             } finally {
+                // Kembalikan keadaan butang asal
                 btnSave.disabled = false;
                 btnSave.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span>Simpan Perubahan</span>`;
             }
         });
 
-        // Log Keluar Function
+        // 3. Fungsi Log Keluar Akaun
         document.getElementById('btn-logout').addEventListener('click', async () => {
             if (confirm("Adakah anda pasti untuk log keluar?")) {
                 try {
