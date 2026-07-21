@@ -47,7 +47,8 @@
             <a href="admin-pesanan-masuk.html" class="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-white/10 transition flex items-center gap-2">
                 <i class="fa-solid fa-boxes-packing"></i> <span class="hidden sm:inline">Pesanan Masuk</span>
             </a>
-            <a href="dashboard.html" class="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-white/10 transition flex items-center gap-2">
+            <!-- Betulkan pautan dari dashboard.html kepada admin-dashboard.html -->
+            <a href="admin-dashboard.html" class="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-white/10 transition flex items-center gap-2">
                 <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Dashboard</span>
             </a>
         </div>
@@ -117,7 +118,7 @@
 
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                window.location.href = "login.html";
+                window.location.href = "admin-login.html";
             } else {
                 loadProcessOrders();
             }
@@ -137,7 +138,7 @@
             setTimeout(() => alertBox.classList.add('hidden'), 4000);
         }
 
-        // Baca koleksi 'orders' dan tapis status "Proses"
+        // Baca koleksi 'orders' dan tapis status "Dalam Proses" (atau "Processing")
         function loadProcessOrders() {
             try {
                 onSnapshot(collection(db, "orders"), (snapshot) => {
@@ -148,8 +149,8 @@
                         const order = docSnap.data();
                         const status = order.status ? order.status.trim() : "";
 
-                        // Ambil hanya yang statusnya "Proses"
-                        if (status === "Proses") {
+                        // Menyokong padanan status BM & BI sekiranya berbeza pendaftaran
+                        if (status === "Dalam Proses" || status === "Processing") {
                             processList.push({ id: docSnap.id, ...order });
                         }
                     });
@@ -221,7 +222,7 @@
                                 </a>
 
                                 <div class="grid grid-cols-2 gap-2">
-                                    <!-- Butang Tukar ke Penghantaran / Selesai -->
+                                    <!-- Butang Tukar ke Penghantaran -->
                                     <button onclick="updateToShipping('${order.id}', '${order.recipientName || 'Pelanggan'}')" class="glow-btn-purple py-2.5 px-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-extrabold text-[11px] hover:opacity-90 transition flex items-center justify-center gap-1.5">
                                         <i class="fa-solid fa-truck-fast"></i>
                                         <span>Penghantaran</span>
@@ -248,7 +249,7 @@
 
         // Fungsi Global: Tukar Status ke "Penghantaran"
         window.updateToShipping = async function(orderId, customerName) {
-            if (!confirm(`Tukar status pesanan ${customerName} kepada "Penghantaran / Selesai"?`)) {
+            if (!confirm(`Tukar status pesanan ${customerName} kepada "Penghantaran"?`)) {
                 return;
             }
 
