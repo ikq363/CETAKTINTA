@@ -20,7 +20,6 @@
         .glow-btn { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); transition: all 0.3s ease; }
         .glow-btn:hover { box-shadow: 0 0 25px rgba(168, 85, 247, 0.7); }
         
-        /* Background Animated Blobs */
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; pointer-events: none; }
         .blob-1 { top: 5%; left: 5%; width: 250px; height: 250px; background: #06b6d4; }
         .blob-2 { bottom: 5%; right: 5%; width: 280px; height: 280px; background: #a855f7; }
@@ -121,8 +120,8 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // URL Google Apps Script API Web App Anda
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyMpAkIF64l4qfPIXS2PJK_dIhDf6JJMiJvfE-bLHwpO0tdJBgL1FqrXntbBtbmiiS/exec";
+        // URL Web App Google Apps Script Baharu Anda
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKo29TVLrU8Eyd6uGBbCjm0w7Jr8mg1lBHlVGhUINBfUzsl_oWbKj3-ObZdSav2QAd/exec";
 
         // Konfigurasi Firebase Anda
         const firebaseConfig = {
@@ -141,7 +140,7 @@
 
         let currentUser = null;
 
-        // Semak status pengesahan pengguna
+        // Semak pengesahan pengguna
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -150,7 +149,7 @@
             }
         });
 
-        // Tunjukkan nama fail yang dipilih pelanggan
+        // Papar nama fail dipilih
         const fileInput = document.getElementById('order-file');
         const fileNameDisplay = document.getElementById('file-name-display');
         fileInput.addEventListener('change', (e) => {
@@ -189,6 +188,12 @@
             const btnSubmit = document.getElementById('btn-submit-order');
             const file = fileInput.files[0];
 
+            // Semak saiz fail (Had maksimum 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                showAlert("Saiz fail terlalu besar! Sila muat naik fail bawah 10MB.", "error");
+                return;
+            }
+
             try {
                 btnSubmit.disabled = true;
                 btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memuat Naik Fail ke Drive...</span>`;
@@ -196,27 +201,31 @@
                 // 1. Convert fail ke Base64
                 const base64Data = await fileToBase64(file);
 
-                // 2. Upload fail ke Google Drive via Apps Script Web App
+                // 2. Data payload fail
                 const uploadPayload = {
                     fileName: `${Date.now()}_${file.name}`,
-                    mimeType: file.type,
+                    mimeType: file.type || "application/octet-stream",
                     fileData: base64Data
                 };
 
+                // 3. Hantar fail ke Google Apps Script (guna text/plain untuk pintar sekatan CORS)
                 const driveResponse = await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8"
+                    },
                     body: JSON.stringify(uploadPayload)
                 });
 
                 const driveResult = await driveResponse.json();
 
                 if (driveResult.result !== "success") {
-                    throw new Error("Ralat muat naik fail.");
+                    throw new Error(driveResult.error || "Gagal menyimpan fail ke Drive.");
                 }
 
                 btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Menyimpan Tempahan...</span>`;
 
-                // 3. Simpan maklumat order ke Firestore Collection 'orders'
+                // 4. Simpan maklumat order ke Firestore Collection 'orders'
                 await addDoc(collection(db, "orders"), {
                     userId: currentUser.uid,
                     userEmail: currentUser.email,
@@ -224,9 +233,9 @@
                     printType: document.getElementById('print-type').value,
                     quantity: parseInt(document.getElementById('order-quantity').value),
                     notes: document.getElementById('order-notes').value.trim(),
-                    fileUrl: driveResult.fileUrl,       // Link direct ke fail dalam Drive anda
+                    fileUrl: driveResult.fileUrl,
                     fileDriveId: driveResult.fileId,
-                    status: "Pending",                  // Status asal tempahan
+                    status: "Pending",
                     createdAt: serverTimestamp()
                 });
 
@@ -238,7 +247,7 @@
 
             } catch (error) {
                 console.error("Ralat tempahan:", error);
-                showAlert("Gagal menghantar tempahan. Sila semak semula fail dan cuba lagi.", "error");
+                showAlert("Gagal menghantar tempahan: " + error.message, "error");
             } finally {
                 btnSubmit.disabled = false;
                 btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Hantar Tempahan</span>`;
