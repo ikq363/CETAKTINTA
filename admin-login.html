@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Masuk Admin | Cetak Tinta</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; overflow-x: hidden; }
+        .animated-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); position: relative; }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-input { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; transition: all 0.3s ease; }
+        .glass-input:focus { outline: none; border-color: #06b6d4; box-shadow: 0 0 12px rgba(6, 182, 212, 0.4); }
+        .glow-btn { box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); transition: all 0.3s ease; }
+        .glow-btn:hover { box-shadow: 0 0 25px rgba(168, 85, 247, 0.7); }
+        
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; pointer-events: none; }
+        .blob-1 { top: 10%; left: 10%; width: 250px; height: 250px; background: #06b6d4; }
+        .blob-2 { bottom: 10%; right: 10%; width: 280px; height: 280px; background: #a855f7; }
+    </style>
+</head>
+<body class="animated-bg min-h-screen flex flex-col justify-between py-6">
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Main Container -->
+    <main class="w-full max-w-md mx-auto px-4 my-auto z-10">
+        <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+            
+            <!-- Logo & Header -->
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 via-purple-500 to-yellow-400 p-0.5 flex items-center justify-center shadow-xl mx-auto mb-3">
+                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center">
+                        <i class="fa-solid fa-user-shield text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-2xl"></i>
+                    </div>
+                </div>
+                <h1 class="text-2xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-cyan-400">
+                    CETAK TINTA
+                </h1>
+                <p class="text-[11px] uppercase font-bold tracking-widest text-cyan-400 mt-1">Portal Log Masuk Admin</p>
+            </div>
+
+            <!-- Alert Box -->
+            <div id="alert-box" class="hidden p-3.5 rounded-xl mb-4 text-xs font-semibold flex items-center space-x-2"></div>
+
+            <!-- Form Log Masuk -->
+            <form id="admin-login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">Emel Pentadbir (Admin Email)</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="email" id="admin-email" required placeholder="ikqram363@gmail.com" class="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-slate-300 font-semibold mb-1.5">Kata Laluan (Password)</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="password" id="admin-password" required placeholder="••••••••" class="w-full glass-input rounded-xl py-2.5 pl-10 pr-4 text-sm">
+                    </div>
+                </div>
+
+                <button type="submit" id="btn-login" class="glow-btn w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-extrabold text-sm hover:opacity-90 transition mt-2 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Log Masuk Pentadbir</span>
+                </button>
+            </form>
+
+            <div class="text-center mt-6 pt-4 border-t border-white/10">
+                <a href="login.html" class="text-xs text-slate-400 hover:text-cyan-400 transition flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali ke Log Masuk Pelanggan</span>
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-slate-500 text-xs z-10">
+        &copy; 2026 Cetak Tinta Admin. Hak Cipta Terpelihara.
+    </footer>
+
+    <!-- Firebase Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Emel Admin Sah
+        const ALLOWED_ADMIN_EMAIL = "ikqram363@gmail.com";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKemZYeMNfwOZlX9MYf8iqJVtyoCEixmo",
+            authDomain: "cetaktinta-bb755.firebaseapp.com",
+            projectId: "cetaktinta-bb755",
+            storageBucket: "cetaktinta-bb755.firebasestorage.app",
+            messagingSenderId: "439592324038",
+            appId: "1:439592324038:web:4ab89ce9706447809240c7",
+            measurementId: "G-X9ZEL7PEJV"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.classList.remove('hidden', 'bg-red-500/20', 'border-red-500/50', 'text-red-300', 'bg-green-500/20', 'border-green-500/50', 'text-green-300');
+            
+            if (type === 'error') {
+                alertBox.classList.add('bg-red-500/20', 'border', 'border-red-500/50', 'text-red-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <span>${message}</span>`;
+            } else {
+                alertBox.classList.add('bg-green-500/20', 'border', 'border-green-500/50', 'text-green-300');
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+            }
+        }
+
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+            const btnLogin = document.getElementById('btn-login');
+
+            // Semakan Emel Admin
+            if (email.toLowerCase() !== ALLOWED_ADMIN_EMAIL.toLowerCase()) {
+                showAlert("Akses Ditolak! Emel ini bukan emel pentadbir (admin) yang sah.", "error");
+                return;
+            }
+
+            try {
+                btnLogin.disabled = true;
+                btnLogin.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Mengesahkan...</span>`;
+
+                await signInWithEmailAndPassword(auth, email, password);
+
+                showAlert("Log masuk admin berjaya! Mengalih halaman...", "success");
+
+                setTimeout(() => {
+                    window.location.href = "admin-dashboard.html";
+                }, 1200);
+
+            } catch (error) {
+                console.error("Ralat log masuk admin:", error);
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                    showAlert("Kata laluan tidak sah. Sila cuba lagi.", "error");
+                } else if (error.code === 'auth/user-not-found') {
+                    showAlert("Akaun admin belum didaftarkan di Firebase Console.", "error");
+                } else {
+                    showAlert("Ralat log masuk: " + error.message, "error");
+                }
+            } finally {
+                btnLogin.disabled = false;
+                btnLogin.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> <span>Log Masuk Pentadbir</span>`;
+            }
+        });
+    </script>
+</body>
+</html>
