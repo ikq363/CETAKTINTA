@@ -52,15 +52,15 @@
     <main class="w-full max-w-6xl mx-auto px-6 my-auto z-10">
         <div class="mb-8">
             <h1 class="text-3xl font-extrabold text-white mb-2">Selamat Datang, Admin! 👋</h1>
-            <p class="text-xs text-slate-400">Pilih menu di bawah untuk menguruskan tempahan cetakan pelanggan.</p>
+            <p class="text-xs text-slate-400">Pilih menu di bawah untuk menguruskan tempahan cetakan dan tetapan kedai.</p>
         </div>
 
-        <!-- MENU KAD UTAMA (3 MENU) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- MENU KAD UTAMA (4 MENU) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
             <!-- 1. PESANAN MASUK -->
             <a href="admin-pesanan-masuk.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
-                <div class="absolute -right-4 -bottom-4 opacity-10 text-cyan-400 text-9xl transition transform group-hover:scale-110">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-cyan-400 text-8xl transition transform group-hover:scale-110">
                     <i class="fa-solid fa-inbox"></i>
                 </div>
                 <div>
@@ -73,14 +73,14 @@
                 <div class="flex items-center justify-between pt-4 border-t border-white/10">
                     <span id="count-masuk" class="text-2xl font-black text-cyan-400">0</span>
                     <span class="text-xs text-cyan-300 font-semibold group-hover:translate-x-1 transition flex items-center gap-1">
-                        Urus Pesanan <i class="fa-solid fa-arrow-right"></i>
+                        Urus <i class="fa-solid fa-arrow-right"></i>
                     </span>
                 </div>
             </a>
 
             <!-- 2. PESANAN DALAM PROSES -->
             <a href="admin-pesanan-proses.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
-                <div class="absolute -right-4 -bottom-4 opacity-10 text-yellow-400 text-9xl transition transform group-hover:scale-110">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-yellow-400 text-8xl transition transform group-hover:scale-110">
                     <i class="fa-solid fa-print"></i>
                 </div>
                 <div>
@@ -93,27 +93,47 @@
                 <div class="flex items-center justify-between pt-4 border-t border-white/10">
                     <span id="count-proses" class="text-2xl font-black text-yellow-400">0</span>
                     <span class="text-xs text-yellow-300 font-semibold group-hover:translate-x-1 transition flex items-center gap-1">
-                        Urus Proses <i class="fa-solid fa-arrow-right"></i>
+                        Urus <i class="fa-solid fa-arrow-right"></i>
                     </span>
                 </div>
             </a>
 
             <!-- 3. PESANAN DALAM PENGHANTARAN -->
             <a href="admin-pesanan-penghantaran.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
-                <div class="absolute -right-4 -bottom-4 opacity-10 text-purple-400 text-9xl transition transform group-hover:scale-110">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-purple-400 text-8xl transition transform group-hover:scale-110">
                     <i class="fa-solid fa-truck-fast"></i>
                 </div>
                 <div>
                     <div class="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl mb-4">
                         <i class="fa-solid fa-truck-ramp-box"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-white mb-1">Dalam Penghantaran</h2>
+                    <h2 class="text-lg font-bold text-white mb-1">Penghantaran</h2>
                     <p class="text-xs text-slate-400 mb-6">Tempahan sedia untuk di-pickup atau sedang dihantar.</p>
                 </div>
                 <div class="flex items-center justify-between pt-4 border-t border-white/10">
                     <span id="count-penghantaran" class="text-2xl font-black text-purple-400">0</span>
                     <span class="text-xs text-purple-300 font-semibold group-hover:translate-x-1 transition flex items-center gap-1">
-                        Urus Penghantaran <i class="fa-solid fa-arrow-right"></i>
+                        Urus <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </div>
+            </a>
+
+            <!-- 4. URUS KEDAI -->
+            <a href="admin-urus-kedai.html" class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-10 text-emerald-400 text-8xl transition transform group-hover:scale-110">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl mb-4">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <h2 class="text-lg font-bold text-white mb-1">Urus Kedai</h2>
+                    <p class="text-xs text-slate-400 mb-6">Tetapan harga cetakan, servis, maklumat kedai & promosi.</p>
+                </div>
+                <div class="flex items-center justify-between pt-4 border-t border-white/10">
+                    <span class="text-xs text-emerald-400 font-semibold px-2 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">Tetapan</span>
+                    <span class="text-xs text-emerald-300 font-semibold group-hover:translate-x-1 transition flex items-center gap-1">
+                        Buka <i class="fa-solid fa-arrow-right"></i>
                     </span>
                 </div>
             </a>
@@ -150,14 +170,14 @@
         // Semak status Log In
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                window.location.href = "login.html";
+                window.location.href = "admin-login.html";
             }
         });
 
         // Butang Logout
         document.getElementById('btn-logout').addEventListener('click', () => {
             signOut(auth).then(() => {
-                window.location.href = "login.html";
+                window.location.href = "admin-login.html";
             });
         });
 
